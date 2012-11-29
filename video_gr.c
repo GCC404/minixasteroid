@@ -16,11 +16,26 @@
 /* Private global variables */
 
 static char *video_mem;		/* Process address to which VRAM is mapped */
+static char video_mem_buffer[H_RES*V_RES];
 
 static unsigned h_res;		/* Horizontal screen resolution in pixels */
 static unsigned v_res;		/* Vertical screen resolution in pixels */
 static unsigned bits_per_pixel; /* Number of VRAM bits per pixel */
+static unsigned bytes_per_pixel;
 
+void vg_buffertomem() {
+	int i;
+
+	for(i=0; i<H_RES*V_RES; i++)
+		video_mem[i]=video_mem_buffer[i];
+}
+
+void vg_memtobuffer() {
+	int i;
+
+	for(i=0; i<H_RES*V_RES; i++)
+		video_mem_buffer[i]=video_mem[i];
+}
 
 void * vg_init(unsigned long mode) {
 
@@ -52,6 +67,7 @@ void * vg_init(unsigned long mode) {
 	h_res=H_RES;
 	v_res=V_RES;
 	bits_per_pixel=BITS_PER_PIXEL;
+	bytes_per_pixel=bits_per_pixel/8;
 
 
 	int y;
@@ -69,6 +85,7 @@ void * vg_init(unsigned long mode) {
 	if(video_mem == MAP_FAILED) panic("video_txt couldn't map video memory");
 
 
+
     return NULL;
 }
 
@@ -77,8 +94,6 @@ int vg_fill(unsigned long color) {
 
 	char *p = video_mem;
 	int i;
-
-	printf("video_mem, h_res, v_res: %x %d %d", &video_mem, h_res, v_res);
 
 	if(color>=256||color<0)
 		return -1;
@@ -94,71 +109,23 @@ int vg_fill(unsigned long color) {
 
 int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color) {
 
-	char *p = video_mem;
+	printf("Entrou");
+
+	char *p = video_mem_buffer;
 	int i;
 
 	if(color>=256||color<0||x<0||y<0||x>=h_res||y>=v_res)
 		return -1;
 
-	p+=x*bits_per_pixel;
-	p+=y*h_res*bits_per_pixel;
+	p+=x*bytes_per_pixel;
+	p+=y*h_res*bytes_per_pixel;
 
 	*p=(char)color;
 
-	return 0;
-}
-
-long vg_get_pixel(unsigned long x, unsigned long y) {
-
-	char *p = video_mem;
-
-	if(x<0||y<0||x>=h_res||y>=v_res)
-			return -1;
-
-	p+=x*bits_per_pixel;
-	p+=y*h_res*bits_per_pixel;
-
-	return *p;
-}
-
-unsigned long equation (unsigned long x, unsigned long yi, int m)
-{
-	return x*m+yi;
-}
-
-int vg_draw_line(unsigned long xi, unsigned long yi, 
-		 unsigned long xf, unsigned long yf, unsigned long color) {
-
-	char *p = video_mem;
-
-	if(color>=256||color<0||xi<0||yi<0||xi>=h_res||yi>=v_res||xf<0||yf<0||xf>=h_res||yf>=v_res)
-			return -1;
-
-	p+=xi;
-	p+=yi*h_res;
-
-	unsigned long i, m=(yf-yi)/(xf-xi);
-
-	*p=(char)color;
-
-	if(yi==yf)
-		for(i=0; i<xi-xf;i++)
-		{
-			p++;
-			*p=(char)color;
-		}
-	else if(xi==xf)
-		for(i=0; i<xi-xf;i++)
-		{
-			p+=h_res;
-			*p=(char)color;
-		}
-	else for (i=xi; i<=xf; i++)
-		vg_set_pixel(i,equation(i,yi,m),color);
+	printf("Saiu.");
 
 	return 0;
 }
-
 
 int vg_exit() {
   struct reg86u reg86;

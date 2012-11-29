@@ -9,7 +9,7 @@ typedef struct {
 } Sprite;
 
 
-static int draw_sprite(Sprite *sp, char *base);
+int draw_sprite(Sprite *sp, char *base);
 char *read_xpm(char *map[], int *wd, int *ht);
 
 /** Creates with random speeds (not zero) and position
@@ -17,7 +17,7 @@ char *read_xpm(char *map[], int *wd, int *ht);
  * memory whose address is "base";
  * Returns NULL on invalid pixmap.
  */
-Sprite * create_sprite(char *pic[], char *base);
+Sprite * create_sprite(char *pic[], char *base, int x, int y);
 
 /** Animate the sprite "fig" according to its attributes in memory,
  * whose address is "base".  The animation detects the screen borders

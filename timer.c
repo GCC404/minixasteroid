@@ -1,6 +1,8 @@
 #include <minix/syslib.h>
 #include <minix/drivers.h>
 #include <time.h>
+#include "vbe.h"
+#include "video_gr.h"
 #include "i8254.h"
 
 static unsigned int intcounter = 0;
@@ -52,11 +54,11 @@ int timer_unsubscribe_int() {
 
 void timer_int_handler() {
 
-	intcounter++;
+	int i;
+	char* asteroids[1024];
 
-	if(intcounter%60==0) {
-		printf("Count: %d\n",intcounter/60);
-	}
+	for(i=0; i<1024; i++)
+		asteroids[i]=rand()%2;
 
 }
 
