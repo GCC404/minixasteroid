@@ -22,11 +22,35 @@
  * Falta testar resto dos perifericos
  */
 
+static char *pic1[] = {
+"32 13 4", /* número de pixels horizontais, verticais, e cores */
+". 0", /* símbolo ’.’ representa pixel de cor 0 */
+"x 2", /* símbolo ’x’ representa pixel de cor 2 */
+"o 14",
+"+ 4",
+"................................", /* pixels ... */
+"..............xxx...............",
+"............xxxxxxx.............",
+".........xxxxxx+xxxxxx..........",
+"......xxxxxxx+++++xxxxxxx.......",
+"....xxxxxxx+++++++++xxxxxxx.....",
+"....xxxxxxx+++++++++xxxxxxx.....",
+"......xxxxxxx+++++xxxxxxx.......",
+".........xxxxxx+xxxxxx..........",
+"..........ooxxxxxxxoo...........",
+".......ooo...........ooo........",
+".....ooo...............ooo......",
+"...ooo...................ooo...."
+};
+
+#define VRAM_PHYS_ADDR    	0xD0000000 //ja em video_gr
+
 int main(int argc, char **argv) {
 
 	endpoint_t ep;
 	char name[256];
 	int priv_f;
+	char* video_mem;
 
 	sef_startup();
 	/* Fetch our endpoint */
@@ -34,9 +58,13 @@ int main(int argc, char **argv) {
 	/* Enable IO-sensitive operations for ourselves */
 	sys_enable_iop(ep);
 
-	//vg_init(0x105); /* Change to video mode */
+	vg_init(0x105); /* Change to video mode */
 
-	test_scan();
+	//test_scan(); /* Rato */
+
+	Sprite* s1=create_sprite(pic1,video_mem);
+	draw_sprite(sp,video_mem);
+
 
 	sleep(3);
 

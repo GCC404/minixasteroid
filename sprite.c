@@ -12,7 +12,7 @@
  * draws it in memory whose address is "base";
  * Returns NULL on invalid pixmap.
  */
-Sprite *create_sprite(char *pic[], char *bas) {
+Sprite *create_sprite(char *pic[], char *base) {
 
 	//allocate space for the "object"
 	Sprite *sp = (Sprite *) malloc ( sizeof(Sprite));
@@ -25,6 +25,7 @@ Sprite *create_sprite(char *pic[], char *bas) {
 		free(sp);
 		return NULL;
 	}
+
 	return sp;
 }
 
@@ -101,5 +102,10 @@ static int check_collision(Sprite *sp, char *base) {
 }
 
 static int draw_sprite(Sprite *sp, char *base) {
-	//...
+	int i,j;
+
+	for( i = 0; i<sp->width;i++)
+		for( j = 0; j<sp->height; j++, (sp->map)++)
+			vg_set_pixel(i, j, *(sp->map));
+
 }
