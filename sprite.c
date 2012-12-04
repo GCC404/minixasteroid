@@ -12,7 +12,7 @@
  * draws it in memory whose address is "base";
  * Returns NULL on invalid pixmap.
  */
-Sprite *create_sprite(char *pic[], char *base, int x, int y) {
+Sprite *create_sprite(char *pic[], int x, int y) {
 
 	//allocate space for the "object"
 	Sprite *sp = (Sprite *) malloc ( sizeof(Sprite));
@@ -91,27 +91,38 @@ char *read_xpm(char *map[], int *wd, int *ht)
 	return pix;
 }
 
-void destroy_sprite(Sprite *sp, char *base) {
+void destroy_sprite(Sprite *sp) {
 
 	if( sp == NULL )
 		return;
 	free(sp->map);
 	free(sp);
 	sp = NULL; // hopeless: pointer is passed by value
+
+}
+
+void erase_sprite(Sprite *sprt, unsigned long background) {
+
+	int i, j;
+
+	for (i = 0; i < sprt->height; i++)
+		for (j = 0; j < sprt->width; j++, sprt->map++)
+			vg_set_pixel_buffer(j+sprt->x, i+sprt->y, background);
+
 }
 
 static int check_collision(Sprite *sp, char *base) {
 	//...
 }
 
-int draw_sprite(Sprite *sp, char *base) {
-	int i,j,k;
+int draw_sprite(Sprite *sprt) {
 
-	printf("Xp:%x , Yp:%x",sp->x,sp->y);
+	int i, j;
 
-	for( i = 0; i<sp->width;i++)
-		for( j = 0; j<sp->height; j++, (sp->map)++)
-			vg_set_pixel(j+(sp->x), i+(sp->y), *(sp->map));
+	for (i = 0; i < sprt->height; i++)
+		for (j = 0; j < sprt->width; j++, sprt->map++)
+			vg_set_pixel_buffer(j+sprt->x, i+sprt->y, *sprt->map);
 
 
+	return 0;
 }
