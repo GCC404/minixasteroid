@@ -123,6 +123,19 @@ int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color) {
 	return 0;
 }
 
+long vg_get_pixel_buffer(unsigned long x, unsigned long y) {
+
+	char *p = video_mem_buffer;
+
+	if(x<0||y<0||x>=h_res||y>=v_res)
+			return -1;
+
+	p+=x*bytes_per_pixel;
+	p+=y*h_res*bytes_per_pixel;
+
+	return *p;
+}
+
 int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color) {
 
 	char *p = video_mem_buffer;

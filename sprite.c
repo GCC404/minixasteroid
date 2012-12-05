@@ -121,6 +121,19 @@ int draw_sprite(Sprite *sprt) {
 
 	for (i = 0; i < sprt->height; i++)
 		for (j = 0; j < sprt->width; j++, sprt->map++)
+			if(*sprt->map!=0 && vg_get_pixel_buffer(j,i)!=25 && vg_get_pixel_buffer(j,i)!=17 && vg_get_pixel_buffer(j,i)!=27)
+				vg_set_pixel_buffer(j+sprt->x, i+sprt->y, *sprt->map);
+
+
+	return 0;
+}
+
+int draw_sprite2(Sprite *sprt) {
+
+	int i, j;
+
+	for (i = 0; i < sprt->height; i++)
+		for (j = 0; j < sprt->width; j++, sprt->map++)
 			if(*sprt->map!=0)
 				vg_set_pixel_buffer(j+sprt->x, i+sprt->y, *sprt->map);
 

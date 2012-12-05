@@ -10,6 +10,7 @@
 void vg_buffertomem();
 void vg_memtobuffer();
 int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color);
+long vg_get_pixel_buffer(unsigned long x, unsigned long y);
 
 /**
  * @brief Initializes the video module in graphics mode

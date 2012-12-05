@@ -10,6 +10,7 @@ typedef struct {
 
 
 int draw_sprite(Sprite *sp);
+int draw_sprite2(Sprite *sprt);
 char *read_xpm(char *map[], int *wd, int *ht);
 
 /** Creates with random speeds (not zero) and position
