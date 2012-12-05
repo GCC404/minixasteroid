@@ -15,7 +15,8 @@ int main(int argc, char **argv) {
 	char name[256];
 	int priv_f;
 
-	Sprite* pilha[5];
+	Sprite* pilhas[5];
+	Sprite* sprites[5];
 	int posicaopilhax=1024-110, posicaopilhay=0;
 
 	sef_startup();
@@ -28,29 +29,23 @@ int main(int argc, char **argv) {
 	vg_fill(BACKGROUND);
 	vg_memtobuffer();
 
-	pilha[0]=create_sprite(pilha,posicaopilhax,posicaopilhay);
-	draw_sprite(pilha[0]);
-	pilha[1]=create_sprite(pilhadentro,posicaopilhax+83,posicaopilhay+12);
-	draw_sprite2(pilha[1]);
-	pilha[2]=create_sprite(pilhadentro,posicaopilhax+63,posicaopilhay+12);
-	draw_sprite2(pilha[2]);
-	pilha[3]=create_sprite(pilhadentro,posicaopilhax+43,posicaopilhay+12);
-	draw_sprite2(pilha[3]);
-	pilha[4]=create_sprite(pilhadentro,posicaopilhax+23,posicaopilhay+12);
-	draw_sprite2(pilha[4]);
+	pilhas[0]=create_sprite(pilha,posicaopilhax,posicaopilhay);
+	draw_sprite(pilhas[0]);
+	pilhas[1]=create_sprite(pilhadentro,posicaopilhax+83,posicaopilhay+12);
+	draw_sprite2(pilhas[1]);
+	pilhas[2]=create_sprite(pilhadentro,posicaopilhax+63,posicaopilhay+12);
+	draw_sprite2(pilhas[2]);
+	pilhas[3]=create_sprite(pilhadentro,posicaopilhax+43,posicaopilhay+12);
+	draw_sprite2(pilhas[3]);
+	pilhas[4]=create_sprite(pilhadentro,posicaopilhax+23,posicaopilhay+12);
+	draw_sprite2(pilhas[4]);
 
-	printf("Pixel: %d\n",vg_get_pixel_buffer(83,13));
-
-
-	sprites[4]=create_sprite(spaceship,0,0);
+	sprites[4]=create_sprite(spaceship,768-100,1024/2);
 	draw_sprite(sprites[4]);
 
 	vg_buffertomem();
 	sleep(4);
 	//destroy_sprite(sprites[0]);
-
-	//test_scan(); /* Rato */
-	//timer_test_int(10);
 
 	vg_exit(); /* Return to text mode */
 
