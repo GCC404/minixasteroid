@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
 	pilhas[4]=create_sprite(pilhadentro,posicaopilhax+23,posicaopilhay+12);
 	draw_sprite2(pilhas[4]);
 
-	sprites[4]=create_sprite(spaceship,768-100,1024/2);
+	sprites[4]=create_sprite(spaceship,768-100,(1024/2)-20);
 	draw_sprite(sprites[4]);
 
 	vg_buffertomem();
