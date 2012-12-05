@@ -121,7 +121,8 @@ int draw_sprite(Sprite *sprt) {
 
 	for (i = 0; i < sprt->height; i++)
 		for (j = 0; j < sprt->width; j++, sprt->map++)
-			vg_set_pixel_buffer(j+sprt->x, i+sprt->y, *sprt->map);
+			if(*sprt->map!=0)
+				vg_set_pixel_buffer(j+sprt->x, i+sprt->y, *sprt->map);
 
 
 	return 0;

@@ -109,7 +109,21 @@ int vg_fill(unsigned long color) {
 
 int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color) {
 
-	printf("Entrou");
+	char *p = video_mem;
+	int i;
+
+	if(color>=256||color<0||x<0||y<0||x>=h_res||y>=v_res)
+		return -1;
+
+	p+=x*bytes_per_pixel;
+	p+=y*h_res*bytes_per_pixel;
+
+	*p=(char)color;
+
+	return 0;
+}
+
+int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color) {
 
 	char *p = video_mem_buffer;
 	int i;
@@ -121,8 +135,6 @@ int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color) {
 	p+=y*h_res*bytes_per_pixel;
 
 	*p=(char)color;
-
-	printf("Saiu.");
 
 	return 0;
 }
