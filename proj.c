@@ -18,7 +18,8 @@ int main(int argc, char **argv) {
 	message msg;
 
 	Sprite* pilhas[5];
-	Sprite* sprites[6];
+	Sprite* sprites[1];
+	Sprite* asteroids[5];
 	int posicaopilhax=1024-110, posicaopilhay=0;
 
 	sef_startup();
@@ -50,18 +51,15 @@ int main(int argc, char **argv) {
 	vg_buffertomem();
 	sleep(1);
 
-	sprites[1]=create_sprite(spaceship,0,0);
-	draw_sprite(sprites[1]);
-	sprites[2]=create_sprite(spaceship,70,0);
-	draw_sprite(sprites[2]);
-	sprites[3]=create_sprite(spaceship,140,0);
-	draw_sprite(sprites[3]);
-	sprites[4]=create_sprite(spaceship,210,0);
-		draw_sprite(sprites[4]);
-		sprites[5]=create_sprite(spaceship,280,0);
-			draw_sprite(sprites[5]);
+	int i;
+	srand(time(NULL));
+
+	for(i=0; i<5; i++) {
+		asteroids[i]=create_sprite(spaceship,rand()%1024,0);
+		draw_sprite(asteroids[i]);
+	}
+
 	vg_buffertomem();
-	sleep(1);
 
 	unsigned int intcounter = 0, frequency=60;
 
@@ -77,10 +75,10 @@ int main(int argc, char **argv) {
 
 					int a;
 					if(intcounter%frequency==0) {
-						for(a=1; a<6; a++) {
-							erase_sprite(sprites[a],BACKGROUND);
-							sprites[a]->y+=100;
-							draw_sprite(sprites[a]);
+						for(a=0; a<5; a++) {
+							erase_sprite(asteroids[a],BACKGROUND);
+							asteroids[a]->y+=100;
+							draw_sprite(asteroids[a]);
 						}
 						vg_buffertomem();
 					}

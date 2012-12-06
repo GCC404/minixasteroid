@@ -117,7 +117,6 @@ static int check_collision(Sprite *sp, char *base) {
 }
 
 int draw_sprite(Sprite *sprt) {
-
 	int i, j;
 	Sprite tmp=*sprt;
 
