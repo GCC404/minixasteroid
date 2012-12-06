@@ -104,10 +104,11 @@ void destroy_sprite(Sprite *sp) {
 void erase_sprite(Sprite *sprt, unsigned long background) {
 
 	int i, j;
+	Sprite tmp=*sprt;
 
-	for (i = 0; i < sprt->height; i++)
-		for (j = 0; j < sprt->width; j++, sprt->map++)
-			vg_set_pixel_buffer(j+sprt->x, i+sprt->y, background);
+	for (i = 0; i < tmp.height; i++)
+		for (j = 0; j < tmp.width; j++, tmp.map++)
+			vg_set_pixel_buffer(j+tmp.x, i+tmp.y, background);
 
 }
 
@@ -118,11 +119,12 @@ static int check_collision(Sprite *sp, char *base) {
 int draw_sprite(Sprite *sprt) {
 
 	int i, j;
+	Sprite tmp=*sprt;
 
-	for (i = 0; i < sprt->height; i++)
-		for (j = 0; j < sprt->width; j++, sprt->map++)
-			if(*sprt->map!=0 && vg_get_pixel_buffer(j,i)!=25 && vg_get_pixel_buffer(j,i)!=17 && vg_get_pixel_buffer(j,i)!=27)
-				vg_set_pixel_buffer(j+sprt->x, i+sprt->y, *sprt->map);
+	for (i = 0; i < tmp.height; i++)
+		for (j = 0; j < tmp.width; j++, tmp.map++)
+			if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)!=25 && vg_get_pixel_buffer(j,i)!=17 && vg_get_pixel_buffer(j,i)!=27)
+				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
 
 
 	return 0;
@@ -131,11 +133,12 @@ int draw_sprite(Sprite *sprt) {
 int draw_sprite2(Sprite *sprt) {
 
 	int i, j;
+	Sprite tmp=*sprt;
 
-	for (i = 0; i < sprt->height; i++)
-		for (j = 0; j < sprt->width; j++, sprt->map++)
-			if(*sprt->map!=0)
-				vg_set_pixel_buffer(j+sprt->x, i+sprt->y, *sprt->map);
+	for (i = 0; i < tmp.height; i++)
+		for (j = 0; j < tmp.width; j++, tmp.map++)
+			if(*tmp.map!=0)
+				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
 
 
 	return 0;

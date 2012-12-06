@@ -51,6 +51,7 @@ proj.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include/stdarg.h
 proj.o:	kbd.h
 proj.o:	mouse.h
 proj.o:	proj.c
+proj.o:	proj.h
 proj.o:	rtc.h
 proj.o:	sprite.h
 proj.o:	timer.h

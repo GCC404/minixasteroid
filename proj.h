@@ -3,6 +3,8 @@
 
 #define BACKGROUND 0
 
+static int rtc_hook=4, mousehook=3, hook=2;
+
 static char * penguin[] = {
 "64 64 9",
 "  14",
