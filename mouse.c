@@ -101,6 +101,79 @@ int test_packet() {
 
 	return 1;
 }
+int mouse_pos(unsigned char *posx, unsigned char *posy) {
+
+	unsigned char packet[3];
+	unsigned short count=0;
+	unsigned long stat;
+	int ipc_status, buttonterminate=0;
+	message msg;
+
+	//Enable Mouse
+	sys_outb(KBC_CMD_REG,ENABLE_MOUSE);
+
+	//Enable Sending Data Packets
+	sys_outb(KBC_CMD_REG,WRITE_BYTE);
+	sys_inb(IN_BUF,&stat);
+	sys_outb(OUT_BUF,ENABLE_DATA);
+	sys_inb(IN_BUF, &stat);
+
+	mouse_subscribe_int();
+
+	if(stat!=ACK)
+	{
+		mouse_unsubscribe_int();
+		printf("Enabling DataPackets failed, retrying..\n");
+
+		if(errorc>5)
+			return -1;
+
+		errorc++;
+		test_packet();
+	}
+	//tickdelay(micros_to_ticks(WAIT_TIME));
+
+	while(1) {
+
+		/* Get a request message. */
+		if ( driver_receive(ANY, &msg, &ipc_status) != 0 ) {
+			printf("driver_receive failed with: %d", 55555);
+			continue;
+		}
+
+		if (is_ipc_notify(ipc_status)) { /* received notification */
+			switch (_ENDPOINT_P(msg.m_source)) {
+			case HARDWARE: /* hardware interrupt notification */
+				if (msg.NOTIFY_ARG & 8) { /* subscribed interrupt */
+
+					sys_inb(IN_BUF,&stat);
+
+					if( !(stat&BIT(3)) && (count==0)) {
+						break;
+					}
+
+					packet[count]=stat;
+					count++;
+
+					if(count>2)
+					{
+						posx=&packet[1];
+						posy=&packet[2];
+						return 1;
+					}
+				}
+				break;
+			default:
+				break; /* no other notifications expected: do nothing */
+			}
+		} else { /* received a standard message, not a notification */
+			/* no standard messages expected: do nothing */
+		}
+	}
+	
+	mouse_unsubscribe_int();
+	return 1;
+}
 
 typedef enum{A,B,C} state_qwe;
 int handle_mouse(unsigned char mouse_evt) {
