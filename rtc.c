@@ -1,7 +1,7 @@
 #include "rtc.h"
 #include <minix/drivers.h>
 
-int rtc_hook=4;
+static int rtc_hook=4;
 
 /* BEFORE USING
  *

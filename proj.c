@@ -9,6 +9,24 @@
 #include "vbe.h"
 #include "proj.h"
 
+//int kbdhook=5, timerhook=2, mousehook=3, rtc_hook=4;
+//27 pilhadentro
+//17 interior
+//25 exterior
+//43 nave
+
+/* RTC atualizar velocidade (asteroidvel) com alarme
+ * Mostrar tempo decorrido
+ * Transparencia
+ * Modular codigo
+ * (do)comentar codigo
+ * remover extras dos .c
+ * Colisoes
+ * Acabar rato
+ * Ataques especiais (?)
+ * destroy_sprite
+ */
+
 int main(int argc, char **argv) {
 
 	endpoint_t ep;
@@ -19,7 +37,8 @@ int main(int argc, char **argv) {
 
 	Sprite* pilhas[5];
 	Sprite* sprites[1];
-	Sprite* asteroids[5];
+	Sprite* asteroids[35];
+	Sprite* shotsprt[4];
 	int posicaopilhax=1024-110, posicaopilhay=0;
 
 	sef_startup();
@@ -27,8 +46,10 @@ int main(int argc, char **argv) {
 	sys_whoami(&ep, name, 256, &priv_f);
 	/* Enable IO-sensitive operations for ourselves */
 	sys_enable_iop(ep);
+	rtc_subscribe_int();
 	mouse_subscribe_int();
 	timer_subscribe_int();
+	kbd_subscribe_int();
 
 	vg_init(0x105);
 	vg_fill(BACKGROUND);
@@ -45,55 +66,139 @@ int main(int argc, char **argv) {
 	pilhas[4]=create_sprite(pilhadentro,posicaopilhax+23,posicaopilhay+12);
 	draw_sprite2(pilhas[4]);
 
-	sprites[0]=create_sprite(spaceship,768-100,(1024/2)-20);
-	draw_sprite(sprites[0]);
+	vg_buffertomem();
+	sleep(1);
+
+	asteroids[0]=create_sprite(asteroid,posicaopilhax,posicaopilhay);
+	draw_sprite(asteroids[0]);
 
 	vg_buffertomem();
 	sleep(1);
+/*
+	sprites[0]=create_sprite(spaceship,(1024/2)-20,768-100);
+	draw_sprite(sprites[0]);
 
 	int i;
 	srand(time(NULL));
 
 	for(i=0; i<5; i++) {
-		asteroids[i]=create_sprite(spaceship,rand()%1024,0);
-		draw_sprite(asteroids[i]);
+		shotsprt[i]=create_sprite(shot,0,0);
+	}
+
+	for(i=0; i<35; i++) {
+		asteroids[i]=create_sprite(asteroid,rand()%1024,-90);
+		asteroids[i]=create_sprite(asteroid,rand()%1024, -90*((i%9)+1) );
 	}
 
 	vg_buffertomem();
 
-	unsigned int intcounter = 0, frequency=60;
+	unsigned int intcounter=1, asteroidperiod=1, asteroidvel=1, shotsperiod=150, shots=4, astc=5;
+	unsigned char scancode, changed=0;
 
-	while(intcounter < 5 * 60) {
+	do {
 		if ( driver_receive(ANY, &msg, &ipc_status) != 0 ) {
 			printf("driver_receive failed with: %d", 55555);
 			continue;
 		}
 		if (is_ipc_notify(ipc_status)) {
 			switch (_ENDPOINT_P(msg.m_source)) {
+
 			case HARDWARE:
 				if (msg.NOTIFY_ARG & 4) {
 
 					int a;
-					if(intcounter%frequency==0) {
-						for(a=0; a<5; a++) {
+					if(intcounter%asteroidperiod==0) {
+						for(a=0; a<35; a++) {
 							erase_sprite(asteroids[a],BACKGROUND);
-							asteroids[a]->y+=100;
-							draw_sprite(asteroids[a]);
+							asteroids[a]->y+=asteroidvel;
+
+							if(asteroids[a]->y>768) {
+								asteroids[a]->y=-90;
+								asteroids[a]->x=rand()%1024;
+							}else draw_sprite(asteroids[a]);
 						}
-						vg_buffertomem();
+
+						for(a=4-shots; a>0; a--) {
+							erase_sprite(shotsprt[a-1],BACKGROUND);
+							shotsprt[a-1]->y-=5;
+							draw_sprite(shotsprt[a-1]);
+						}
+
+						changed=1;
 					}
+
+					if(intcounter%shotsperiod==0 && shots<5) {
+						draw_sprite2(pilhas[shots]);
+
+						if(shots<4)
+							shots++;
+
+						changed=1;
+					}
+
+					if(changed==1) {
+						vg_buffertomem();
+						changed=0;
+					}
+
 
 					intcounter++;
 				}
+
+				if (msg.NOTIFY_ARG & 32) {
+
+					scancode = kbd_int_handler();
+
+					if(scancode==-1)
+					{
+						printf("Reading Error from Status Register");
+						return -1;
+					}
+					if(0x80 & scancode)
+						printf("Makecode: %x\n", scancode);
+					else printf("Breakcode: %x\n", scancode);
+
+					if(scancode==A_BREAK) {
+						erase_sprite(sprites[0],BACKGROUND);
+						sprites[0]->x-=5;
+						draw_sprite(sprites[0]);
+						changed=1;
+					}
+
+					if(scancode==D_BREAK) {
+						erase_sprite(sprites[0],BACKGROUND);
+						sprites[0]->x+=5;
+						draw_sprite(sprites[0]);
+						changed=1;
+					}
+
+					if(scancode==D_BREAK) {
+						erase_sprite(sprites[0],BACKGROUND);
+						sprites[0]->x+=5;
+						draw_sprite(sprites[0]);
+						changed=1;
+					}
+
+					if(scancode==SPACE_BREAK && shots>0) {
+						erase_sprite2(pilhas[shots],25);
+
+						shotsprt[4-shots]->x=sprites[0]->x;
+						shotsprt[4-shots]->y=sprites[0]->y;
+						draw_sprite(shotsprt[4-shots]);
+
+						shots--;
+						changed=1;
+					}
+
+				}
 				break;
+
 			default:
 				break;
 			}
 		} else {
 		}
-	}
-
-	//destroy_sprite(sprites[0]);
+	} while(scancode!=ESC_BREAK);*/
 	
 	Sprite* rato[2];
 	int posx_inicial=20;
@@ -194,10 +299,11 @@ int main(int argc, char **argv) {
 			/* no standard messages expected: do nothing */
 		/*}
 	}
-	mouse_unsubscribe_int();
 	*/
+	rtc_unsubscribe_int();
 	mouse_unsubscribe_int();
 	timer_unsubscribe_int();
+	kbd_unsubscribe_int();
 	vg_exit(); /* Return to text mode */
 
 

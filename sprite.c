@@ -108,6 +108,18 @@ void erase_sprite(Sprite *sprt, unsigned long background) {
 
 	for (i = 0; i < tmp.height; i++)
 		for (j = 0; j < tmp.width; j++, tmp.map++)
+			if(vg_get_pixel_buffer(j,i)!=25 && vg_get_pixel_buffer(j,i)!=17 && vg_get_pixel_buffer(j,i)!=27)
+				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, background);
+
+}
+
+void erase_sprite2(Sprite *sprt, unsigned long background) {
+
+	int i, j;
+	Sprite tmp=*sprt;
+
+	for (i = 0; i < tmp.height; i++)
+		for(j = 0; j < tmp.width; j++, tmp.map++)
 			vg_set_pixel_buffer(j+tmp.x, i+tmp.y, background);
 
 }

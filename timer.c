@@ -6,7 +6,7 @@
 #include "i8254.h"
 
 static unsigned int intcounter = 0;
-static int hook=2;
+static int timerhook=2;
 
 int timer_set_square(unsigned long timer, unsigned long freq) {
 
@@ -38,16 +38,16 @@ int timer_set_square(unsigned long timer, unsigned long freq) {
 
 int timer_subscribe_int(void ) {
 
-	sys_irqsetpolicy(0,IRQ_REENABLE,&hook);
-	sys_irqenable(&hook);
+	sys_irqsetpolicy(0,IRQ_REENABLE,&timerhook);
+	sys_irqenable(&timerhook);
 
 	return 1;
 }
 
 int timer_unsubscribe_int() {
 
-	sys_irqrmpolicy(&hook);
-	sys_irqdisable(&hook);
+	sys_irqrmpolicy(&timerhook);
+	sys_irqdisable(&timerhook);
 
 	return 1;
 }

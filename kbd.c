@@ -2,7 +2,7 @@
 #include <minix/drivers.h>
 #include "kbd.h"
 
-static int hook=2, timerhook=1;
+static int kbdhook=5, timerhook=1;
 static unsigned int intcounter = 0;
 
 int test_scan(void) {
@@ -70,16 +70,16 @@ int issue_command(unsigned char cmd) {
 
 int kbd_subscribe_int(void ) {
 
-	sys_irqsetpolicy(KBD_IRQ,IRQ_REENABLE|IRQ_EXCLUSIVE,&hook);
-	sys_irqenable(&hook);
+	sys_irqsetpolicy(KBD_IRQ,IRQ_REENABLE|IRQ_EXCLUSIVE,&kbdhook);
+	sys_irqenable(&kbdhook);
 
 	return 1;
 }
 
 int kbd_unsubscribe_int() {
 
-	sys_irqrmpolicy(&hook);
-	sys_irqdisable(&hook);
+	sys_irqrmpolicy(&kbdhook);
+	sys_irqdisable(&kbdhook);
 
 	return 1;
 }
