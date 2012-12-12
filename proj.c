@@ -21,6 +21,7 @@
  * Modular codigo
  * (do)comentar codigo
  * remover extras dos .c
+ * page flipping
  * Colisoes
  * Acabar rato
  * Ataques especiais (?)
@@ -39,6 +40,8 @@ int main(int argc, char **argv) {
 	Sprite* sprites[1];
 	Sprite* asteroids[35];
 	Sprite* shotsprt[4];
+	Sprite* timesprt[3];
+	unsigned int times[]={0,0,0};
 	int posicaopilhax=1024-110, posicaopilhay=0;
 
 	sef_startup();
@@ -66,17 +69,27 @@ int main(int argc, char **argv) {
 	pilhas[4]=create_sprite(pilhadentro,posicaopilhax+23,posicaopilhay+12);
 	draw_sprite2(pilhas[4]);
 
-	vg_buffertomem();
+	/*
 	sleep(1);
+	printf("Buffer    %u\n",vg_get_pixel_buffer(posicaopilhax+43,posicaopilhay+12));
+	//printf("Buffer    %u\n",vg_get_pixel(posicaopilhax+43,posicaopilhay+12));
 
 	asteroids[0]=create_sprite(asteroid,posicaopilhax,posicaopilhay);
 	draw_sprite(asteroids[0]);
 
 	vg_buffertomem();
-	sleep(1);
-/*
+	sleep(1);*/
+
+
 	sprites[0]=create_sprite(spaceship,(1024/2)-20,768-100);
 	draw_sprite(sprites[0]);
+
+	timesprt[0]=create_sprite(digits[0],140,0);
+	draw_sprite(timesprt[0]);
+	timesprt[1]=create_sprite(digits[0],70,0);
+	draw_sprite(timesprt[1]);
+	//timesprt[2]=create_sprite(digits[0],0,0);
+	//draw_sprite(timesprt[2]);
 
 	int i;
 	srand(time(NULL));
@@ -91,6 +104,7 @@ int main(int argc, char **argv) {
 	}
 
 	vg_buffertomem();
+	sleep(1);
 
 	unsigned int intcounter=1, asteroidperiod=1, asteroidvel=1, shotsperiod=150, shots=4, astc=5;
 	unsigned char scancode, changed=0;
@@ -136,11 +150,35 @@ int main(int argc, char **argv) {
 						changed=1;
 					}
 
+					if(intcounter%120==0) {
+
+						if(times[0]==9) {
+							times[0]=0;
+
+							if(times[1]==9) {
+								times[1]=0;
+/*
+								if(times[2]==9)
+									times[2]=0;
+								else times[2]++;*/
+
+							}else times[1]++;
+
+						}else times[0]++;
+
+						for(a=0; a<2; a++) {
+							erase_sprite(timesprt[a],BACKGROUND);
+							timesprt[a]=create_sprite(digits[times[a]],timesprt[a]->x,timesprt[a]->y);
+							draw_sprite2(timesprt[a]);
+						}
+
+						changed=1;
+					}
+
 					if(changed==1) {
 						vg_buffertomem();
 						changed=0;
 					}
-
 
 					intcounter++;
 				}
@@ -198,15 +236,16 @@ int main(int argc, char **argv) {
 			}
 		} else {
 		}
-	} while(scancode!=ESC_BREAK);*/
-	
+	} while(scancode!=ESC_BREAK);
+
+	/*
 	Sprite* rato[2];
 	int posx_inicial=20;
 	int posy_inicial=23;
 	//rato[0]=create_sprite(spaceship,posx_inicial,posy_inicial);
 	//draw_sprite(rato[0]);
 	rato[1]=create_sprite(asteroid,posx_inicial,posy_inicial);
-		draw_sprite(rato[1]);
+		draw_sprite(rato[1]);*/
 /*
 	unsigned char packet[3];
 	unsigned char desl_x=0, desl_y=0, novo_x=0, novo_y=0;

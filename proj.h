@@ -11,8 +11,6 @@
 #define D_BREAK				0x20
 #define D_MAKE				0xA0
 
-
-
 static char * digits0[] = {
 "62 93 2",
 "  25",
@@ -1363,5 +1361,7 @@ static char * shot[] = {
 "  ",
 "  ",
 };
+
+static char** digits[]={digits0,digits1,digits2,digits3,digits4,digits5,digits6,digits7,digits8, digits9};
 
 #endif
