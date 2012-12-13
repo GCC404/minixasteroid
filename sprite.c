@@ -108,7 +108,7 @@ void erase_sprite(Sprite *sprt, unsigned long background) {
 
 	for (i = 0; i < tmp.height; i++)
 		for (j = 0; j < tmp.width; j++, tmp.map++)
-			if(vg_get_pixel_buffer(j,i)!=25 && vg_get_pixel_buffer(j,i)!=17 && vg_get_pixel_buffer(j,i)!=27)
+			if(vg_get_pixel_buffer(j,i)!=25 && vg_get_pixel_buffer(j,i)!=17)
 				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, background);
 
 }
@@ -134,7 +134,7 @@ int draw_sprite(Sprite *sprt) {
 
 	for (i = 0; i < tmp.height; i++)
 		for (j = 0; j < tmp.width; j++, tmp.map++)
-			if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)!=25 && vg_get_pixel_buffer(j,i)!=17 && vg_get_pixel_buffer(j,i)!=27)
+			if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)==0)
 				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
 
 

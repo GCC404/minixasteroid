@@ -107,6 +107,23 @@ int vg_fill(unsigned long color) {
 	return 0;
 }
 
+int vg_fill_buffer(unsigned long color) {
+
+	char *p = video_mem_buffer;
+	int i;
+
+	if(color>=256||color<0)
+		return -1;
+
+	for(i=0; i<h_res*v_res;i++)
+	{
+		*p=(char)color;
+		p++;
+	}
+
+	return 0;
+}
+
 int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color) {
 
 	char *p = video_mem;

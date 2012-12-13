@@ -16,8 +16,6 @@
 //43 nave
 
 /* RTC atualizar velocidade (asteroidvel) com alarme
- * Mostrar tempo decorrido
- * Transparencia
  * Modular codigo
  * (do)comentar codigo
  * remover extras dos .c
@@ -25,7 +23,6 @@
  * Colisoes
  * Acabar rato
  * Ataques especiais (?)
- * destroy_sprite
  */
 
 int main(int argc, char **argv) {
@@ -69,18 +66,6 @@ int main(int argc, char **argv) {
 	pilhas[4]=create_sprite(pilhadentro,posicaopilhax+23,posicaopilhay+12);
 	draw_sprite2(pilhas[4]);
 
-	/*
-	sleep(1);
-	printf("Buffer    %u\n",vg_get_pixel_buffer(posicaopilhax+43,posicaopilhay+12));
-	//printf("Buffer    %u\n",vg_get_pixel(posicaopilhax+43,posicaopilhay+12));
-
-	asteroids[0]=create_sprite(asteroid,posicaopilhax,posicaopilhay);
-	draw_sprite(asteroids[0]);
-
-	vg_buffertomem();
-	sleep(1);*/
-
-
 	sprites[0]=create_sprite(spaceship,(1024/2)-20,768-100);
 	draw_sprite(sprites[0]);
 
@@ -88,8 +73,8 @@ int main(int argc, char **argv) {
 	draw_sprite(timesprt[0]);
 	timesprt[1]=create_sprite(digits[0],70,0);
 	draw_sprite(timesprt[1]);
-	//timesprt[2]=create_sprite(digits[0],0,0);
-	//draw_sprite(timesprt[2]);
+	timesprt[2]=create_sprite(digits[0],0,0);
+	draw_sprite(timesprt[2]);
 
 	int i;
 	srand(time(NULL));
@@ -106,8 +91,9 @@ int main(int argc, char **argv) {
 	vg_buffertomem();
 	sleep(1);
 
-	unsigned int intcounter=1, asteroidperiod=1, asteroidvel=1, shotsperiod=150, shots=4, astc=5;
-	unsigned char scancode, changed=0;
+	unsigned int intcounter=1, asteroidperiod=1, asteroidvel=1, shotvel=5, shipvel=10, shotsperiod=150, shots=4;
+	unsigned char scancode;
+	unsigned int changed=0;
 
 	do {
 		if ( driver_receive(ANY, &msg, &ipc_status) != 0 ) {
@@ -123,27 +109,23 @@ int main(int argc, char **argv) {
 					int a;
 					if(intcounter%asteroidperiod==0) {
 						for(a=0; a<35; a++) {
-							erase_sprite(asteroids[a],BACKGROUND);
 							asteroids[a]->y+=asteroidvel;
 
 							if(asteroids[a]->y>768) {
 								asteroids[a]->y=-90;
 								asteroids[a]->x=rand()%1024;
 							}else draw_sprite(asteroids[a]);
+
 						}
 
 						for(a=4-shots; a>0; a--) {
-							erase_sprite(shotsprt[a-1],BACKGROUND);
-							shotsprt[a-1]->y-=5;
-							draw_sprite(shotsprt[a-1]);
+							shotsprt[a-1]->y-=shotvel;
 						}
 
 						changed=1;
 					}
 
 					if(intcounter%shotsperiod==0 && shots<5) {
-						draw_sprite2(pilhas[shots]);
-
 						if(shots<4)
 							shots++;
 
@@ -157,26 +139,35 @@ int main(int argc, char **argv) {
 
 							if(times[1]==9) {
 								times[1]=0;
-/*
+
 								if(times[2]==9)
 									times[2]=0;
-								else times[2]++;*/
+								else times[2]++;
 
 							}else times[1]++;
 
 						}else times[0]++;
 
-						for(a=0; a<2; a++) {
-							erase_sprite(timesprt[a],BACKGROUND);
+						for(a=0; a<3; a++) {
 							timesprt[a]=create_sprite(digits[times[a]],timesprt[a]->x,timesprt[a]->y);
-							draw_sprite2(timesprt[a]);
 						}
 
 						changed=1;
 					}
 
 					if(changed==1) {
+						draw_sprite(sprites[0]);
+						for(a=4-shots; a>0; a--) {
+							draw_sprite(shotsprt[a-1]);
+						}
+						for(a=0; a<3; a++) {
+							draw_sprite2(timesprt[a]);
+						}
+						for(a=0; a<=shots; a++) {
+							draw_sprite2(pilhas[a]);
+						}
 						vg_buffertomem();
+						vg_fill_buffer(BACKGROUND);
 						changed=0;
 					}
 
@@ -192,37 +183,22 @@ int main(int argc, char **argv) {
 						printf("Reading Error from Status Register");
 						return -1;
 					}
-					if(0x80 & scancode)
-						printf("Makecode: %x\n", scancode);
-					else printf("Breakcode: %x\n", scancode);
+
 
 					if(scancode==A_BREAK) {
-						erase_sprite(sprites[0],BACKGROUND);
-						sprites[0]->x-=5;
-						draw_sprite(sprites[0]);
+						sprites[0]->x-=shipvel;
 						changed=1;
 					}
 
 					if(scancode==D_BREAK) {
-						erase_sprite(sprites[0],BACKGROUND);
-						sprites[0]->x+=5;
-						draw_sprite(sprites[0]);
-						changed=1;
-					}
-
-					if(scancode==D_BREAK) {
-						erase_sprite(sprites[0],BACKGROUND);
-						sprites[0]->x+=5;
-						draw_sprite(sprites[0]);
+						sprites[0]->x+=shipvel;
 						changed=1;
 					}
 
 					if(scancode==SPACE_BREAK && shots>0) {
-						erase_sprite2(pilhas[shots],25);
 
 						shotsprt[4-shots]->x=sprites[0]->x;
 						shotsprt[4-shots]->y=sprites[0]->y;
-						draw_sprite(shotsprt[4-shots]);
 
 						shots--;
 						changed=1;
