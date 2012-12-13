@@ -9,7 +9,12 @@
 #define A_BREAK				0x1E
 #define A_MAKE				0x9E
 #define D_BREAK				0x20
-#define D_MAKE				0xA0
+#define D_MAKE				0xA0/*
+#define SECONDS_ALARM		0x01
+#define MINUTES_ALARM		0x03
+#define HOURS_ALARM			0x05
+#define REG_C				0x0C
+#define BIT(n) 				(0x01<<(n))*/
 
 static char * digits0[] = {
 "62 93 2",
@@ -1355,7 +1360,7 @@ static char * pilhadentro[] = {
 
 static char * shot[] = {
 "3 4 1",
-"  27",
+"  30",
 "  ",
 "  ",
 "  ",

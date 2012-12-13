@@ -91,16 +91,6 @@ char *read_xpm(char *map[], int *wd, int *ht)
 	return pix;
 }
 
-void destroy_sprite(Sprite *sp) {
-
-	if( sp == NULL )
-		return;
-	free(sp->map);
-	free(sp);
-	sp = NULL; // hopeless: pointer is passed by value
-
-}
-
 void erase_sprite(Sprite *sprt, unsigned long background) {
 
 	int i, j;
@@ -124,10 +114,6 @@ void erase_sprite2(Sprite *sprt, unsigned long background) {
 
 }
 
-static int check_collision(Sprite *sp, char *base) {
-	//...
-}
-
 int draw_sprite(Sprite *sprt) {
 	int i, j;
 	Sprite tmp=*sprt;
@@ -135,6 +121,21 @@ int draw_sprite(Sprite *sprt) {
 	for (i = 0; i < tmp.height; i++)
 		for (j = 0; j < tmp.width; j++, tmp.map++)
 			if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)==0)
+				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
+
+
+	return 0;
+}
+
+int draw_asteroid(Sprite *sprt) {
+	int i, j;
+	Sprite tmp=*sprt;
+
+	for (i = 0; i < tmp.height; i++)
+		for (j = 0; j < tmp.width; j++, tmp.map++)
+			if(vg_get_pixel_buffer(j,i)==43)
+				printf("Colidiu.\n");
+			else if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)==0)
 				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
 
 

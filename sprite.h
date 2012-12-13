@@ -13,6 +13,7 @@ int draw_sprite(Sprite *sp);
 int draw_sprite2(Sprite *sprt);
 char *read_xpm(char *map[], int *wd, int *ht);
 void erase_sprite(Sprite *sprt, unsigned long background);
+int draw_asteroid(Sprite *sprt);
 
 /** Creates with random speeds (not zero) and position
  * (within the screen limits), a new sprite with pixmap "pic", in
