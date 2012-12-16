@@ -4,10 +4,10 @@
 
 #include "sprite.h"
 
-#define HRES             	1024
-#define VRES				768
+#define H_RES             	1024
+#define V_RES				768
 
-/** Creates with random speeds (not zero) and position
+/** Creates sprites with a given position
  * (within the screen limits), a new sprite with pixmap "pic", and
  * draws it in memory whose address is "base";
  * Returns NULL on invalid pixmap.
@@ -47,7 +47,7 @@ char *read_xpm(char *map[], int *wd, int *ht)
 		return NULL;
 	}
 
-	if (width > HRES || height > VRES || colors > 256) {
+	if (width > H_RES || height > V_RES || colors > 256) {
 		printf("read_xpm: incorrect width, height, colors\n");
 		return NULL;
 	}
@@ -101,32 +101,7 @@ void erase_sprite(Sprite *sprt, unsigned long background) {
 			if(vg_get_pixel_buffer(j,i)!=25 && vg_get_pixel_buffer(j,i)!=17)
 				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, background);
 
-}
 
-void erase_sprite2(Sprite *sprt, unsigned long background) {
-
-	int i, j;
-	Sprite tmp=*sprt;
-
-	for (i = 0; i < tmp.height; i++)
-		for(j = 0; j < tmp.width; j++, tmp.map++)
-			vg_set_pixel_buffer(j+tmp.x, i+tmp.y, background);
-
-}
-
-int draw_sprite(Sprite *sprt) {
-	int i, j;
-	Sprite tmp=*sprt;
-
-	for (i = 0; i < tmp.height; i++)
-		for (j = 0; j < tmp.width; j++, tmp.map++)
-			if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)==0)
-				if(vg_get_pixel_buffer(j,i)==63)
-					sleep(1);
-				else vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
-
-
-	return 0;
 }
 
 int draw_spaceship(Sprite *sprt) {
@@ -156,7 +131,7 @@ int draw_asteroid(Sprite *sprt) {
 			if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)==0)
 				if(vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==30) {
 					erase_sprite(sprt,0);
-					sprt->x=VRES+500;
+					sprt->x=V_RES+500;
 					printf("Destruido.\n");
 					return 0;
 				}
@@ -166,7 +141,7 @@ int draw_asteroid(Sprite *sprt) {
 	return 0;
 }
 
-int draw_sprite2(Sprite *sprt) {
+int draw_sprite(Sprite *sprt) {
 
 	int i, j;
 	Sprite tmp=*sprt;
@@ -175,7 +150,6 @@ int draw_sprite2(Sprite *sprt) {
 		for (j = 0; j < tmp.width; j++, tmp.map++)
 			if(*tmp.map!=0)
 				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
-
 
 	return 0;
 }

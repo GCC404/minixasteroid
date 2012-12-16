@@ -161,6 +161,7 @@ proj.o:	sprite.h
 proj.o:	timer.h
 proj.o:	vbe.h
 proj.o:	video_gr.h
+proj.o:	xpm.h
 
 rtc.o:	/usr/include/errno.h
 rtc.o:	/usr/include/limits.h
@@ -314,13 +315,11 @@ timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stdio.h
 timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/stdlib.h
 timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/string.h
 timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/syslimits.h
-timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/time.h
 timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/unistd.h
 timer.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include/stdarg.h
 timer.o:	i8254.h
 timer.o:	timer.c
-timer.o:	vbe.h
-timer.o:	video_gr.h
+timer.o:	timer.h
 
 vbe.o:	/usr/include/errno.h
 vbe.o:	/usr/include/limits.h
@@ -429,3 +428,4 @@ video_gr.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include-fixed/unistd.h
 video_gr.o:	/usr/pkg/gcc44/lib/gcc/i686-pc-minix/4.4.3/include/stdarg.h
 video_gr.o:	vbe.h
 video_gr.o:	video_gr.c
+video_gr.o:	video_gr.h

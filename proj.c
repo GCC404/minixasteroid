@@ -1,12 +1,3 @@
-#include <minix/drivers.h>
-
-#include "kbd.h"
-#include "mouse.h"
-#include "rtc.h"
-#include "timer.h"
-#include "sprite.h"
-#include "video_gr.h"
-#include "vbe.h"
 #include "proj.h"
 
 //int kbdhook=5, timerhook=2, mousehook=3, rtc_hook=4;
@@ -17,45 +8,45 @@
 //63 asteroid
 //30 shot
 
-/* RTC atualizar velocidade (asteroidvel) com alarme -> corrigir isto
- * Colisoes
+/* RTC atualizar velocidade (asteroidvel) com alarme -> corrigir isto -> acho que o lab nao esta bem
+ * Destruir Asteroides
  * Carregar palete
- * Modular codigo
- * (do)comentar codigo
+ *
+ * Modular codigo -> tirar do principal e meter nos outros (ver ponto abaixo)
+ * Partilhar variaveis globais com modulos
  * remover extras dos .c
- * page flipping
- * Acabar rato
+ *
+ * (do)comentar codigo
+ *
+ * Pormenores:
+ * Page flipping
  * Ataques especiais (?)
- * tiro sincronia
+ * Tiro sincronia - provavelmente nao e preciso
  */
 
 int main(int argc, char **argv) {
 
+	//Used for peripheric functioning (including interrupts)
 	endpoint_t ep;
 	char name[256];
 	int priv_f;
 	int ipc_status;
 	message msg;
 
-	Sprite* pilhas[5];
-	Sprite* sprites[1];
-	Sprite* asteroids[35];
-	Sprite* shotsprt[4];
-	Sprite* timesprt[3];
-	unsigned short times[]={0,0,0}, timesalarm[]={0,0,0};
-	int posicaopilhax=1024-110, posicaopilhay=0;
+
 
 	sef_startup();
 	sys_whoami(&ep, name, 256, &priv_f);
 	sys_enable_iop(ep);
 
+	//Subscribing RTC interrupts
 	unsigned long stat;
 	choosePort(REG_B);
 	readPort(&stat);
 	choosePort(REG_B);
 	writePort((stat&0x7F)|BIT(4)|BIT(5));
-
 	rtc_subscribe_int();
+
 	mouse_subscribe_int();
 	timer_subscribe_int();
 	kbd_subscribe_int();
@@ -64,19 +55,22 @@ int main(int argc, char **argv) {
 	vg_fill(BACKGROUND);
 	vg_memtobuffer();
 
-	pilhas[0]=create_sprite(pilha,posicaopilhax,posicaopilhay);
-	draw_sprite2(pilhas[0]);
-	pilhas[1]=create_sprite(pilhadentro,posicaopilhax+83,posicaopilhay+12);
-	draw_sprite2(pilhas[1]);
-	pilhas[2]=create_sprite(pilhadentro,posicaopilhax+63,posicaopilhay+12);
-	draw_sprite2(pilhas[2]);
-	pilhas[3]=create_sprite(pilhadentro,posicaopilhax+43,posicaopilhay+12);
-	draw_sprite2(pilhas[3]);
-	pilhas[4]=create_sprite(pilhadentro,posicaopilhax+23,posicaopilhay+12);
-	draw_sprite2(pilhas[4]);
 
-	sprites[0]=create_sprite(spaceship,(1024/2)-20,768-100);
-	draw_sprite(sprites[0]);
+
+	//Initializing sprites, using randomness on asteroids
+	batteries[0]=create_sprite(battery,BATTERYXPOS,BATTERYYPOS);
+	draw_sprite(batteries[0]);
+	batteries[1]=create_sprite(batteryinside,BATTERYXPOS+83,BATTERYYPOS+12);
+	draw_sprite(batteries[1]);
+	batteries[2]=create_sprite(batteryinside,BATTERYXPOS+63,BATTERYYPOS+12);
+	draw_sprite(batteries[2]);
+	batteries[3]=create_sprite(batteryinside,BATTERYXPOS+43,BATTERYYPOS+12);
+	draw_sprite(batteries[3]);
+	batteries[4]=create_sprite(batteryinside,BATTERYXPOS+23,BATTERYYPOS+12);
+	draw_sprite(batteries[4]);
+
+	spaceships[0]=create_sprite(spaceship,(H_RES/2)-20,V_RES-100);
+	draw_spaceship(spaceships[0]);
 
 	timesprt[0]=create_sprite(digits[0],140,0);
 	draw_sprite(timesprt[0]);
@@ -91,20 +85,14 @@ int main(int argc, char **argv) {
 	for(i=0; i<5; i++) {
 		shotsprt[i]=create_sprite(shot,0,0);
 	}
-
-	for(i=0; i<35; i++) {
+	for(i=0; i<NUM_ASTEROIDS; i++) {
 		asteroids[i]=create_sprite(asteroid,rand()%1024,-90);
 		asteroids[i]=create_sprite(asteroid,rand()%1024, -90*((i%9)+1) );
 	}
 
 	vg_buffertomem();
 
-	unsigned int intcounter=1, asteroidperiod=1,
-			asteroidvel=1, shotvel=5, shipvel=10,
-			shotsperiod=150, shots=4, delta=100;
-	unsigned short readtime=0, finished=0;
-	unsigned char scancode;
-	unsigned int changed=0;
+
 
 	do {
 		if ( driver_receive(ANY, &msg, &ipc_status) != 0 ) {
@@ -117,104 +105,16 @@ int main(int argc, char **argv) {
 			case HARDWARE:
 				if (msg.NOTIFY_ARG & 4) {
 
-					int a;
-
-					if(changed==1) {
-						finished=draw_spaceship(sprites[0]);
-
-						for(a=4-shots; a>0; a--) {
-							draw_sprite(shotsprt[a-1]);
-						}
-						for(a=0; a<3; a++) {
-							draw_sprite2(timesprt[a]);
-						}
-						for(a=0; a<=shots; a++) {
-							draw_sprite2(pilhas[a]);
-						}
-						vg_buffertomem();
-						vg_fill_buffer(BACKGROUND);
-						changed=0;
-					}
-
-					if(intcounter%asteroidperiod==0) {
-						for(a=0; a<35; a++) {
-							asteroids[a]->y+=asteroidvel;
-
-							if(asteroids[a]->y>768) {
-								asteroids[a]->y=-90;
-								asteroids[a]->x=rand()%1024;
-							}else draw_asteroid(asteroids[a]);
-
-						}
-
-						for(a=4-shots; a>0; a--) {
-							shotsprt[a-1]->y-=shotvel;
-						}
-
-						changed=1;
-					}
-
-					if(intcounter%shotsperiod==0 && shots<5) {
-						if(shots<4)
-							shots++;
-
-						changed=1;
-					}
-
-					if(intcounter%120==0) {
-
-						if(times[0]==9) {
-							times[0]=0;
-
-							if(times[1]==9) {
-								times[1]=0;
-
-								if(times[2]==9)
-									times[2]=0;
-								else times[2]++;
-
-							}else times[1]++;
-
-						}else times[0]++;
-
-						for(a=0; a<3; a++) {
-							timesprt[a]=create_sprite(digits[times[a]],timesprt[a]->x,timesprt[a]->y);
-						}
-
-						changed=1;
-					}
-
+					timer_int_handler();
 					intcounter++;
+
 				}
 
 				if (msg.NOTIFY_ARG & 32) {
 
-					scancode = kbd_int_handler();
-
-					if(scancode==-1)
-					{
-						printf("Reading Error from Status Register");
-						return -1;
-					}
-
-
-					if(scancode==A_BREAK) {
-						sprites[0]->x-=shipvel;
-						changed=1;
-					}
-
-					if(scancode==D_BREAK) {
-						sprites[0]->x+=shipvel;
-						changed=1;
-					}
-
-					if(scancode==SPACE_BREAK && shots>0) {
-
-						shotsprt[4-shots]->x=sprites[0]->x;
-						shotsprt[4-shots]->y=sprites[0]->y;
-
-						shots--;
-						changed=1;
+					while(1) {
+						if(kbd_int_handler()!=-1)
+							break;
 					}
 
 				}
@@ -235,17 +135,17 @@ int main(int argc, char **argv) {
 						//Sets the alarm
 						choosePort(SECONDS_ALARM);
 
-						if(timesalarm[0]+delta>=60) {
-							timesalarm[0]=timesalarm[0]+delta-60;
+						if(timesalarm[0]+DELTA>=60) {
+							timesalarm[0]=timesalarm[0]+DELTA-60;
 							if(timesalarm[1]+1>=60)
-								timesalarm[1]=timesalarm[1]+delta-60;
+								timesalarm[1]=timesalarm[1]+DELTA-60;
 							else timesalarm[1]=timesalarm[1]+1;
 
 							if(timesalarm[2]+1>=24)
-								timesalarm[2]=timesalarm[2]+delta-24;
+								timesalarm[2]=timesalarm[2]+DELTA-24;
 							else timesalarm[2]=timesalarm[2]+1;
 
-						}else timesalarm[0]=timesalarm[0]+delta;
+						}else timesalarm[0]=timesalarm[0]+DELTA;
 
 						writePort(timesalarm[0]);
 						choosePort(MINUTES_ALARM);
@@ -266,9 +166,7 @@ int main(int argc, char **argv) {
 				break;
 			}
 		}
-	} while(scancode!=ESC_BREAK && finished==0);
-
-	//sleep(2);
+	} while(finished==0);
 
 	rtc_unsubscribe_int();
 	mouse_unsubscribe_int();
@@ -276,6 +174,110 @@ int main(int argc, char **argv) {
 	kbd_unsubscribe_int();
 	vg_exit();
 
-
 	return 0;
+}
+
+void timer_int_handler() {
+	int a;
+
+	if(changed==1) {
+		finished=draw_spaceship(spaceships[0]);
+
+		for(a=4-shots; a>0; a--) {
+			draw_sprite(shotsprt[a-1]);
+		}
+		for(a=0; a<3; a++) {
+			draw_sprite(timesprt[a]);
+		}
+		for(a=0; a<=shots; a++) {
+			draw_sprite(batteries[a]);
+		}
+		vg_buffertomem();
+		vg_fill_buffer(BACKGROUND);
+		changed=0;
+	}
+
+	if(intcounter%ASTEROID_PERIOD==0) {
+		for(a=0; a<NUM_ASTEROIDS; a++) {
+			asteroids[a]->y+=asteroidvel;
+
+			if(asteroids[a]->y>768) {
+				asteroids[a]->y=-90;
+				asteroids[a]->x=rand()%1024;
+			}else draw_asteroid(asteroids[a]);
+
+		}
+
+		for(a=4-shots; a>0; a--) {
+			shotsprt[a-1]->y-=shotvel;
+		}
+
+		changed=1;
+	}
+
+	if(intcounter%SHOT_PERIOD==0 && shots<5) {
+		if(shots<4)
+			shots++;
+
+		changed=1;
+	}
+
+	if(intcounter%120==0) {
+
+		if(times[0]==9) {
+			times[0]=0;
+
+			if(times[1]==9) {
+				times[1]=0;
+
+				if(times[2]==9)
+					times[2]=0;
+				else times[2]++;
+
+			}else times[1]++;
+
+		}else times[0]++;
+
+		for(a=0; a<3; a++) {
+			timesprt[a]=create_sprite(digits[times[a]],timesprt[a]->x,timesprt[a]->y);
+		}
+
+		changed=1;
+	}
+}
+
+int kbd_int_handler() {
+	//Will store C@KBD responses
+	unsigned char scancode;
+
+	scancode = kbd_readscancode();
+
+	if(scancode==-1)
+	{
+		printf("Reading Error from Status Register");
+		return -1;
+	}
+
+
+	if(scancode==A_BREAK) {
+		spaceships[0]->x-=shipvel;
+		changed=1;
+	}
+
+	if(scancode==D_BREAK) {
+		spaceships[0]->x+=shipvel;
+		changed=1;
+	}
+
+	if(scancode==SPACE_BREAK && shots>0) {
+
+		shotsprt[4-shots]->x=spaceships[0]->x;
+		shotsprt[4-shots]->y=spaceships[0]->y;
+
+		shots--;
+		changed=1;
+	}
+
+	if(scancode==ESC_BREAK)
+		finished=1;
 }

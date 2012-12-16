@@ -57,3 +57,4 @@ proj.o:	sprite.h
 proj.o:	timer.h
 proj.o:	vbe.h
 proj.o:	video_gr.h
+proj.o:	xpm.h

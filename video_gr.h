@@ -1,6 +1,9 @@
 #ifndef __VIDEO_GR_H
 #define __VIDEO_GR_H
 
+#define H_RES             	1024
+#define V_RES				768
+
 /** @defgroup video_gr video_gr
  * @{
  *
@@ -9,10 +12,9 @@
 
 void vg_buffertomem();
 void vg_memtobuffer();
-int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color);
-char vg_get_pixel_buffer(unsigned long x, unsigned long y);
-int vg_fill_buffer(unsigned long color);
+
 char vg_get_pixel(unsigned long x, unsigned long y);
+char vg_get_pixel_buffer(unsigned long x, unsigned long y);
 
 /**
  * @brief Initializes the video module in graphics mode
@@ -25,7 +27,7 @@ char vg_get_pixel(unsigned long x, unsigned long y);
  * @param mode 16-bit VBE mode to set
  * @return Virtual address VRAM was mapped to. NULL, upon failure.
  */
-void *vg_init(unsigned short mode);
+void *vg_init(unsigned long mode);
 
 /**
  * @brief Fills the screen with the input color
@@ -34,6 +36,7 @@ void *vg_init(unsigned short mode);
  * @return 0 on success, non-zero upon failure
  */
 int vg_fill(unsigned long color);
+int vg_fill_buffer(unsigned long color);
 
 /**
  * @brief Sets input pixel with input color
@@ -47,6 +50,7 @@ int vg_fill(unsigned long color);
  * @return 0 on success, non-zero otherwise
  */
 int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color);
+int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color);
 
  /**
  * @brief Returns to default Minix 3 text mode (0x03: 25 x 80, 16 colors)

@@ -5,12 +5,11 @@
 #include <sys/types.h>
 
 #include "vbe.h"
+#include "video_gr.h"
 
 /* Constants for VBE 0x105 mode */
 
 #define VRAM_PHYS_ADDR    	0xD0000000
-#define H_RES             	1024
-#define V_RES				768
 #define BITS_PER_PIXEL	 	8
 
 /* Private global variables */
@@ -21,7 +20,7 @@ static char video_mem_buffer[H_RES*V_RES];
 static unsigned h_res;		/* Horizontal screen resolution in pixels */
 static unsigned v_res;		/* Vertical screen resolution in pixels */
 static unsigned bits_per_pixel; /* Number of VRAM bits per pixel */
-static unsigned bytes_per_pixel;
+static unsigned bytes_per_pixel; /* Number of VRAM bytes per pixel */
 
 void vg_buffertomem() {
 	int i;
@@ -63,12 +62,10 @@ void * vg_init(unsigned long mode) {
 
 
 
-
 	h_res=H_RES;
 	v_res=V_RES;
 	bits_per_pixel=BITS_PER_PIXEL;
 	bytes_per_pixel=bits_per_pixel/8;
-
 
 	int y;
 	struct mem_range mr;
@@ -81,14 +78,10 @@ void * vg_init(unsigned long mode) {
 
 	/* Map memory */
 	video_mem = vm_map_phys(SELF, (void *)mr.mr_base, h_res*v_res);
-
 	if(video_mem == MAP_FAILED) panic("video_txt couldn't map video memory");
-
-
 
     return NULL;
 }
-
 
 int vg_fill(unsigned long color) {
 
@@ -103,8 +96,6 @@ int vg_fill(unsigned long color) {
 		*p=(char)color;
 		p++;
 	}
-
-	return 0;
 }
 
 int vg_fill_buffer(unsigned long color) {
@@ -120,8 +111,6 @@ int vg_fill_buffer(unsigned long color) {
 		*p=(char)color;
 		p++;
 	}
-
-	return 0;
 }
 
 int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color) {
@@ -140,17 +129,20 @@ int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color) {
 	return 0;
 }
 
-char vg_get_pixel_buffer(unsigned long x, unsigned long y) {
+int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color) {
 
 	char *p = video_mem_buffer;
+	int i;
 
-	if(x<0||y<0||x>=h_res||y>=v_res)
-			return -1;
+	if(color>=256||color<0||x<0||y<0||x>=h_res||y>=v_res)
+		return -1;
 
 	p+=x*bytes_per_pixel;
 	p+=y*h_res*bytes_per_pixel;
 
-	return *p;
+	*p=(char)color;
+
+	return 0;
 }
 
 char vg_get_pixel(unsigned long x, unsigned long y) {
@@ -166,20 +158,17 @@ char vg_get_pixel(unsigned long x, unsigned long y) {
 	return *p;
 }
 
-int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color) {
+char vg_get_pixel_buffer(unsigned long x, unsigned long y) {
 
 	char *p = video_mem_buffer;
-	int i;
 
-	if(color>=256||color<0||x<0||y<0||x>=h_res||y>=v_res)
-		return -1;
+	if(x<0||y<0||x>=h_res||y>=v_res)
+			return -1;
 
 	p+=x*bytes_per_pixel;
 	p+=y*h_res*bytes_per_pixel;
 
-	*p=(char)color;
-
-	return 0;
+	return *p;
 }
 
 int vg_exit() {
