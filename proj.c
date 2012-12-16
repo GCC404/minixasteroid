@@ -14,15 +14,19 @@
 //17 interior
 //25 exterior
 //43 nave
+//63 asteroid
+//30 shot
 
-/* RTC atualizar velocidade (asteroidvel) com alarme
+/* RTC atualizar velocidade (asteroidvel) com alarme -> corrigir isto
+ * Colisoes
+ * Carregar palete
  * Modular codigo
  * (do)comentar codigo
  * remover extras dos .c
  * page flipping
- * Colisoes
  * Acabar rato
  * Ataques especiais (?)
+ * tiro sincronia
  */
 
 int main(int argc, char **argv) {
@@ -42,9 +46,7 @@ int main(int argc, char **argv) {
 	int posicaopilhax=1024-110, posicaopilhay=0;
 
 	sef_startup();
-	/* Fetch our endpoint */
 	sys_whoami(&ep, name, 256, &priv_f);
-	/* Enable IO-sensitive operations for ourselves */
 	sys_enable_iop(ep);
 
 	unsigned long stat;
@@ -96,12 +98,11 @@ int main(int argc, char **argv) {
 	}
 
 	vg_buffertomem();
-	sleep(1);
 
 	unsigned int intcounter=1, asteroidperiod=1,
 			asteroidvel=1, shotvel=5, shipvel=10,
-			shotsperiod=150, shots=4, delta=0;
-	unsigned short readtime=0;
+			shotsperiod=150, shots=4, delta=100;
+	unsigned short readtime=0, finished=0;
 	unsigned char scancode;
 	unsigned int changed=0;
 
@@ -117,6 +118,24 @@ int main(int argc, char **argv) {
 				if (msg.NOTIFY_ARG & 4) {
 
 					int a;
+
+					if(changed==1) {
+						finished=draw_spaceship(sprites[0]);
+
+						for(a=4-shots; a>0; a--) {
+							draw_sprite(shotsprt[a-1]);
+						}
+						for(a=0; a<3; a++) {
+							draw_sprite2(timesprt[a]);
+						}
+						for(a=0; a<=shots; a++) {
+							draw_sprite2(pilhas[a]);
+						}
+						vg_buffertomem();
+						vg_fill_buffer(BACKGROUND);
+						changed=0;
+					}
+
 					if(intcounter%asteroidperiod==0) {
 						for(a=0; a<35; a++) {
 							asteroids[a]->y+=asteroidvel;
@@ -124,7 +143,7 @@ int main(int argc, char **argv) {
 							if(asteroids[a]->y>768) {
 								asteroids[a]->y=-90;
 								asteroids[a]->x=rand()%1024;
-							}else draw_sprite(asteroids[a]);
+							}else draw_asteroid(asteroids[a]);
 
 						}
 
@@ -165,22 +184,6 @@ int main(int argc, char **argv) {
 						changed=1;
 					}
 
-					if(changed==1) {
-						draw_sprite(sprites[0]);
-						for(a=4-shots; a>0; a--) {
-							draw_sprite(shotsprt[a-1]);
-						}
-						for(a=0; a<3; a++) {
-							draw_sprite2(timesprt[a]);
-						}
-						for(a=0; a<=shots; a++) {
-							draw_sprite2(pilhas[a]);
-						}
-						vg_buffertomem();
-						vg_fill_buffer(BACKGROUND);
-						changed=0;
-					}
-
 					intcounter++;
 				}
 
@@ -216,7 +219,7 @@ int main(int argc, char **argv) {
 
 				}
 
-				if (msg.NOTIFY_ARG & 16) { /* subscribed interrupt */
+				if (msg.NOTIFY_ARG & 16) {
 
 					choosePort(REG_C);
 					readPort(&stat);
@@ -253,7 +256,8 @@ int main(int argc, char **argv) {
 						readtime=1;
 					}
 					else {
-						asteroidvel*=2;
+						//asteroidvel++;
+						//shipvel++;
 					}
 				}
 				break;
@@ -262,13 +266,15 @@ int main(int argc, char **argv) {
 				break;
 			}
 		}
-	} while(scancode!=ESC_BREAK);
+	} while(scancode!=ESC_BREAK && finished==0);
+
+	//sleep(2);
 
 	rtc_unsubscribe_int();
 	mouse_unsubscribe_int();
 	timer_unsubscribe_int();
 	kbd_unsubscribe_int();
-	vg_exit(); /* Return to text mode */
+	vg_exit();
 
 
 	return 0;

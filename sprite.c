@@ -121,10 +121,30 @@ int draw_sprite(Sprite *sprt) {
 	for (i = 0; i < tmp.height; i++)
 		for (j = 0; j < tmp.width; j++, tmp.map++)
 			if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)==0)
-				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
+				if(vg_get_pixel_buffer(j,i)==63)
+					sleep(1);
+				else vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
 
 
 	return 0;
+}
+
+int draw_spaceship(Sprite *sprt) {
+	int i, j;
+	short colided=0;
+	Sprite tmp=*sprt;
+
+	for (i = 0; i < tmp.height; i++)
+		for (j = 0; j < tmp.width; j++, tmp.map++)
+			if(*tmp.map!=0 && vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==0)
+				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
+			else if(vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==63) {
+				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
+				colided=1;
+			}
+
+
+	return colided;
 }
 
 int draw_asteroid(Sprite *sprt) {
@@ -133,10 +153,14 @@ int draw_asteroid(Sprite *sprt) {
 
 	for (i = 0; i < tmp.height; i++)
 		for (j = 0; j < tmp.width; j++, tmp.map++)
-			if(vg_get_pixel_buffer(j,i)==43)
-				printf("Colidiu.\n");
-			else if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)==0)
-				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
+			if(*tmp.map!=0 && vg_get_pixel_buffer(j,i)==0)
+				if(vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==30) {
+					erase_sprite(sprt,0);
+					sprt->x=VRES+500;
+					printf("Destruido.\n");
+					return 0;
+				}
+				else vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
 
 
 	return 0;
