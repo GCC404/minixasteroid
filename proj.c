@@ -33,8 +33,6 @@ int main(int argc, char **argv) {
 	int ipc_status;
 	message msg;
 
-
-
 	sef_startup();
 	sys_whoami(&ep, name, 256, &priv_f);
 	sys_enable_iop(ep);
@@ -47,15 +45,22 @@ int main(int argc, char **argv) {
 	writePort((stat&0x7F)|BIT(4)|BIT(5));
 	rtc_subscribe_int();
 
+	//Enable Mouse
+	sys_outb(KBC_CMD_REG,ENABLE_MOUSE);
+
+	//Enable Sending Data Packets
+	sys_outb(KBC_CMD_REG,WRITE_BYTE);
+	sys_inb(IN_BUF,&stat);
+	sys_outb(OUT_BUF,ENABLE_DATA);
+	sys_inb(IN_BUF, &stat);
 	mouse_subscribe_int();
+
 	timer_subscribe_int();
 	kbd_subscribe_int();
 
 	vg_init(0x105);
 	vg_fill(BACKGROUND);
 	vg_memtobuffer();
-
-
 
 	//Initializing sprites, using randomness on asteroids
 	batteries[0]=create_sprite(battery,BATTERYXPOS,BATTERYYPOS);
@@ -90,6 +95,9 @@ int main(int argc, char **argv) {
 		asteroids[i]=create_sprite(asteroid,rand()%1024, -90*((i%9)+1) );
 	}
 
+	rato[0]=create_sprite(spaceship,posx_inicial,posy_inicial);
+	draw_sprite(rato[0]);
+
 	vg_buffertomem();
 
 
@@ -107,7 +115,6 @@ int main(int argc, char **argv) {
 
 					timer_int_handler();
 					intcounter++;
-
 				}
 
 				if (msg.NOTIFY_ARG & 32) {
@@ -116,7 +123,6 @@ int main(int argc, char **argv) {
 						if(kbd_int_handler()!=-1)
 							break;
 					}
-
 				}
 
 				if (msg.NOTIFY_ARG & 16) {
@@ -130,7 +136,6 @@ int main(int argc, char **argv) {
 						readTime(&timesalarm[2],HOURS,&stat);
 						readTime(&timesalarm[1],MINUTES,&stat);
 						readTime(&timesalarm[0],SECONDS,&stat);
-
 
 						//Sets the alarm
 						choosePort(SECONDS_ALARM);
@@ -159,6 +164,9 @@ int main(int argc, char **argv) {
 						//asteroidvel++;
 						//shipvel++;
 					}
+				}
+				if (msg.NOTIFY_ARG & 8) {
+					mouse_int_handler();
 				}
 				break;
 
@@ -252,23 +260,18 @@ int kbd_int_handler() {
 
 	scancode = kbd_readscancode();
 
-	if(scancode==-1)
-	{
+	if(scancode==-1) {
 		printf("Reading Error from Status Register");
 		return -1;
 	}
-
-
 	if(scancode==A_BREAK) {
 		spaceships[0]->x-=shipvel;
 		changed=1;
 	}
-
 	if(scancode==D_BREAK) {
 		spaceships[0]->x+=shipvel;
 		changed=1;
 	}
-
 	if(scancode==SPACE_BREAK && shots>0) {
 
 		shotsprt[4-shots]->x=spaceships[0]->x;
@@ -277,7 +280,44 @@ int kbd_int_handler() {
 		shots--;
 		changed=1;
 	}
-
 	if(scancode==ESC_BREAK)
 		finished=1;
+}
+
+void mouse_int_handler() {
+
+	sys_inb(IN_BUF,&stat);
+
+	int confirma=0;
+
+	if( !(stat&BIT(3)) && (count==0))
+		confirma=1;
+
+	packet[count]=stat;
+	count++;
+
+	if(count==3 && confirma==0) {
+		count=0;
+
+		if(packet[1]!=0 || packet[2]!=0) {
+			changed=1;
+			erase_sprite(rato[0], BACKGROUND);
+
+			if(packet[1]!=0) {
+				if(packet[1]<128)
+					posx_inicial+=packet[1];
+				else posx_inicial+=packet[1]-256;
+
+				rato[0]->x=posx_inicial;
+			}
+			if(packet[2]!=0) {
+				if(packet[2]<128)
+					posy_inicial-=packet[2];
+				else posy_inicial-=packet[2]-256;
+
+				rato[0]->y=posy_inicial;
+			}
+			draw_sprite(rato[0]);
+		}
+	}
 }

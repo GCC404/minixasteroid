@@ -28,8 +28,15 @@ Sprite* spaceships[1];
 Sprite* asteroids[NUM_ASTEROIDS];
 Sprite* shotsprt[4];
 Sprite* timesprt[3];
+Sprite* rato[1];
+int posx_inicial=200;
+int posy_inicial=300;
 unsigned short times[]={0,0,0}, timesalarm[]={0,0,0}; // stores time since the game started
 													  // and the time read from the RTC
+
+unsigned char packet[3];
+unsigned short count=0;
+unsigned long stat;
 
 //Relevant to know when to stop reading time, playing, and when to update framebuffer
 unsigned short readtime=0, finished=0, changed=0;
@@ -39,5 +46,6 @@ unsigned int asteroidvel=1, shotvel=5, shipvel=10, shots=4, intcounter=1;
 
 int kbd_int_handler();
 void timer_int_handler();
+void mouse_int_handler();
 
 #endif
