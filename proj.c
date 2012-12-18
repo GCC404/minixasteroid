@@ -74,9 +74,6 @@ int main(int argc, char **argv) {
 	batteries[4]=create_sprite(batteryinside,BATTERYXPOS+23,BATTERYYPOS+12);
 	draw_sprite(batteries[4]);
 
-	spaceships[0]=create_sprite(spaceship,(H_RES/2)-20,V_RES-100);
-	draw_spaceship(spaceships[0]);
-
 	timesprt[0]=create_sprite(digits[0],140,0);
 	draw_sprite(timesprt[0]);
 	timesprt[1]=create_sprite(digits[0],70,0);
@@ -95,8 +92,8 @@ int main(int argc, char **argv) {
 		asteroids[i]=create_sprite(asteroid,rand()%1024, -90*((i%9)+1) );
 	}
 
-	rato[0]=create_sprite(spaceship,posx_inicial,posy_inicial);
-	draw_sprite(rato[0]);
+	spaceships[0]=create_sprite(spaceship,posx_inicial,posy_inicial);
+	draw_spaceship(spaceships[0]);
 
 	vg_buffertomem();
 
@@ -301,23 +298,23 @@ void mouse_int_handler() {
 
 		if(packet[1]!=0 || packet[2]!=0) {
 			changed=1;
-			erase_sprite(rato[0], BACKGROUND);
+			erase_sprite(spaceships[0], BACKGROUND);
 
 			if(packet[1]!=0) {
 				if(packet[1]<128)
 					posx_inicial+=packet[1];
 				else posx_inicial+=packet[1]-256;
 
-				rato[0]->x=posx_inicial;
+				spaceships[0]->x=posx_inicial;
 			}
 			if(packet[2]!=0) {
 				if(packet[2]<128)
 					posy_inicial-=packet[2];
 				else posy_inicial-=packet[2]-256;
 
-				rato[0]->y=posy_inicial;
+				spaceships[0]->y=posy_inicial;
 			}
-			draw_sprite(rato[0]);
+			draw_sprite(spaceships[0]);
 		}
 	}
 }
