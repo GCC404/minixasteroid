@@ -74,12 +74,12 @@ int main(int argc, char **argv) {
 	batteries[4]=create_sprite(batteryinside,BATTERYXPOS+23,BATTERYYPOS+12);
 	draw_sprite(batteries[4]);
 
-	timesprt[0]=create_sprite(digits[0],140,0);
-	draw_sprite(timesprt[0]);
-	timesprt[1]=create_sprite(digits[0],70,0);
-	draw_sprite(timesprt[1]);
 	timesprt[2]=create_sprite(digits[0],0,0);
 	draw_sprite(timesprt[2]);
+	timesprt[1]=create_sprite(digits[0],50,0);
+	draw_sprite(timesprt[1]);
+	timesprt[0]=create_sprite(digits[0],100,0);
+	draw_sprite(timesprt[0]);
 
 	int i;
 	srand(time(NULL));
@@ -244,7 +244,7 @@ void timer_int_handler() {
 		}else times[0]++;
 
 		for(a=0; a<3; a++) {
-			timesprt[a]=create_sprite(digits[times[a]],timesprt[a]->x,timesprt[a]->y);
+			timesprt[a]=create_sprite(digits[times[a]],(2-a)*50,0);
 		}
 
 		changed=1;
@@ -271,7 +271,7 @@ int kbd_int_handler() {
 	}
 	if(scancode==SPACE_BREAK && shots>0) {
 
-		shotsprt[4-shots]->x=spaceships[0]->x;
+		shotsprt[4-shots]->x=(spaceships[0]->x)+17;
 		shotsprt[4-shots]->y=spaceships[0]->y;
 
 		shots--;
