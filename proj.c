@@ -307,8 +307,8 @@ void mouse_int_handler() {
 
 				if(posx_inicial<0)
 					posx_inicial=0;
-				if(posx_inicial>(H_RES-40))
-					posx_inicial=980;
+				else if(posx_inicial>(H_RES-40))
+					posx_inicial=H_RES-40;
 
 				spaceships[0]->x=posx_inicial;
 			}
@@ -319,8 +319,8 @@ void mouse_int_handler() {
 
 				if(posy_inicial<0)
 					posy_inicial=0;
-				if(posy_inicial>(V_RES-150)) //87
-					posy_inicial=600;
+				else if(posy_inicial>(V_RES-100))
+					posy_inicial=V_RES-100;
 
 				spaceships[0]->y=posy_inicial;
 			}
