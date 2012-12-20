@@ -29,8 +29,8 @@ Sprite* asteroids[NUM_ASTEROIDS];
 Sprite* shotsprt[4];
 Sprite* timesprt[3];
 Sprite* rato[1];
-int posx_inicial=(H_RES/2)-20;
-int posy_inicial=V_RES-100;
+int posx_inicial=(H_RES/2)-40;
+int posy_inicial=V_RES-200;
 unsigned short times[]={0,0,0}, timesalarm[]={0,0,0}; // stores time since the game started
 													  // and the time read from the RTC
 

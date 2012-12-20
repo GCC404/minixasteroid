@@ -305,12 +305,22 @@ void mouse_int_handler() {
 					posx_inicial+=packet[1];
 				else posx_inicial+=packet[1]-256;
 
+				if(posx_inicial<0)
+					posx_inicial=0;
+				if(posx_inicial>(H_RES-40))
+					posx_inicial=980;
+
 				spaceships[0]->x=posx_inicial;
 			}
 			if(packet[2]!=0) {
 				if(packet[2]<128)
 					posy_inicial-=packet[2];
 				else posy_inicial-=packet[2]-256;
+
+				if(posy_inicial<0)
+					posy_inicial=0;
+				if(posy_inicial>(V_RES-150)) //87
+					posy_inicial=600;
 
 				spaceships[0]->y=posy_inicial;
 			}
