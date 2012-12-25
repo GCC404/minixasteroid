@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
 				break;
 			}
 		}
-	} while(finished==0);
+	} while(finished<4);
 
 	rtc_unsubscribe_int();
 	mouse_unsubscribe_int();
@@ -186,7 +186,7 @@ void timer_int_handler() {
 	int a;
 
 	if(changed==1) {
-		finished=draw_spaceship(spaceships[0]);
+		finished+=draw_spaceship(spaceships[0]);
 
 		for(a=4-shots; a>0; a--) {
 			draw_sprite(shotsprt[a-1]);
@@ -197,12 +197,13 @@ void timer_int_handler() {
 		for(a=0; a<=shots; a++) {
 			draw_sprite(batteries[a]);
 		}
+
 		vg_buffertomem();
 		vg_fill_buffer(BACKGROUND);
 		changed=0;
 	}
 
-	if(intcounter%ASTEROID_PERIOD==0) {
+	if(intcounter%ASTEROID_PERIOD==0 && finished<4) {
 		for(a=0; a<NUM_ASTEROIDS; a++) {
 			asteroids[a]->y+=asteroidvel;
 
@@ -261,14 +262,7 @@ int kbd_int_handler() {
 		printf("Reading Error from Status Register");
 		return -1;
 	}
-	if(scancode==A_BREAK) {
-		spaceships[0]->x-=shipvel;
-		changed=1;
-	}
-	if(scancode==D_BREAK) {
-		spaceships[0]->x+=shipvel;
-		changed=1;
-	}
+
 	if(scancode==SPACE_BREAK && shots>0) {
 
 		shotsprt[4-shots]->x=(spaceships[0]->x)+17;
@@ -277,8 +271,9 @@ int kbd_int_handler() {
 		shots--;
 		changed=1;
 	}
+
 	if(scancode==ESC_BREAK)
-		finished=1;
+		finished=5;
 }
 
 void mouse_int_handler() {
@@ -298,7 +293,6 @@ void mouse_int_handler() {
 
 		if(packet[1]!=0 || packet[2]!=0) {
 			changed=1;
-			erase_sprite(spaceships[0], BACKGROUND);
 
 			if(packet[1]!=0) {
 				if(packet[1]<128)
@@ -312,6 +306,7 @@ void mouse_int_handler() {
 
 				spaceships[0]->x=posx_inicial;
 			}
+
 			if(packet[2]!=0) {
 				if(packet[2]<128)
 					posy_inicial-=packet[2];
@@ -324,7 +319,6 @@ void mouse_int_handler() {
 
 				spaceships[0]->y=posy_inicial;
 			}
-			draw_sprite(spaceships[0]);
 		}
 	}
 }

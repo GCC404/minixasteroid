@@ -113,7 +113,7 @@ int draw_spaceship(Sprite *sprt) {
 		for (j = 0; j < tmp.width; j++, tmp.map++)
 			if(*tmp.map!=0 && vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==0)
 				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
-			else if(vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==63) {
+			else if(*tmp.map!=0 && vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==63) {
 				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
 				colided=1;
 			}
