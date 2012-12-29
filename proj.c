@@ -137,17 +137,28 @@ int main(int argc, char **argv) {
 						//Sets the alarm
 						choosePort(SECONDS_ALARM);
 
-						if(timesalarm[0]+DELTA>=60) {
-							timesalarm[0]=timesalarm[0]+DELTA-60;
-							if(timesalarm[1]+1>=60)
-								timesalarm[1]=timesalarm[1]+DELTA-60;
-							else timesalarm[1]=timesalarm[1]+1;
+						if(timesalarm[1]+1>=60) {
+							timesalarm[1]=0;
 
 							if(timesalarm[2]+1>=24)
-								timesalarm[2]=timesalarm[2]+DELTA-24;
+								timesalarm[2]=0;
 							else timesalarm[2]=timesalarm[2]+1;
+						}
+						else timesalarm[1]=timesalarm[1]+1;
 
-						}else timesalarm[0]=timesalarm[0]+DELTA;
+						if(timesalarm[0]+(DELTA-60)>=60) {
+							timesalarm[0]=timesalarm[0]+(DELTA-60)-60;
+
+							if(timesalarm[1]+1>=60) {
+								timesalarm[1]=0;
+
+								if(timesalarm[2]+1>=24)
+									timesalarm[2]=0;
+								else timesalarm[2]=timesalarm[2]+1;
+							}
+							else timesalarm[1]=timesalarm[1]+1;
+
+						}else timesalarm[0]=timesalarm[0]+(DELTA-60);
 
 						writePort(timesalarm[0]);
 						choosePort(MINUTES_ALARM);
@@ -158,7 +169,8 @@ int main(int argc, char **argv) {
 						readtime=1;
 					}
 					else {
-						//asteroidvel++;
+						readtime=0;
+						asteroidvel++;
 						//shipvel++;
 					}
 				}
