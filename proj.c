@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
 	srand(time(NULL));
 
 	for(i=0; i<5; i++) {
-		shotsprt[i]=create_sprite(shot,0,0);
+		shotsprt[i]=create_sprite(shot,V_RES+500,0);
 	}
 	for(i=0; i<NUM_ASTEROIDS; i++) {
 		asteroids[i]=create_sprite(asteroid,rand()%1024,-90);
@@ -183,14 +183,13 @@ int main(int argc, char **argv) {
 }
 
 void timer_int_handler() {
-	int a;
+	int a,b;
+
+	short tobedestroyed[NUM_ASTEROIDS]={0}, destshots[4]={0};
 
 	if(changed==1) {
 		finished+=draw_spaceship(spaceships[0]);
 
-		for(a=4-shots; a>0; a--) {
-			draw_sprite(shotsprt[a-1]);
-		}
 		for(a=0; a<3; a++) {
 			draw_sprite(timesprt[a]);
 		}
@@ -204,17 +203,43 @@ void timer_int_handler() {
 	}
 
 	if(intcounter%ASTEROID_PERIOD==0 && finished<4) {
+
+		for(a=4-shots; a>0; a--) {
+			destshots[a-1]=draw_sprite(shotsprt[a-1]);
+		}
+
 		for(a=0; a<NUM_ASTEROIDS; a++) {
 			asteroids[a]->y+=asteroidvel;
 
 			if(asteroids[a]->y>768) {
 				asteroids[a]->y=-90;
 				asteroids[a]->x=rand()%1024;
-			}else draw_asteroid(asteroids[a]);
+			}else tobedestroyed[a]=draw_asteroid(asteroids[a]);
 
 		}
 
-		for(a=4-shots; a>0; a--) {
+		for(a=0; a<NUM_ASTEROIDS; a++)
+			if(tobedestroyed[a]) {
+				erase_sprite(asteroids[a],0);
+
+				for(b=0; b<5; b++)
+					if(destshots[b]==0) {
+						destshots[b]=(asteroids[a]->y)+56;
+						break;
+					}
+
+
+				asteroids[a]->x=V_RES+500;
+				tobedestroyed[a]=0;
+			}
+
+		for(a=4; a>0; a--) {
+			for(b=0; b<5; b++)
+				if(shotsprt[a-1]->y-destshots[b]<30) {
+					erase_sprite(shotsprt[a-1],0);
+					shotsprt[a-1]->x=V_RES+500;
+				}
+
 			shotsprt[a-1]->y-=shotvel;
 		}
 

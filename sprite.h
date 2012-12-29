@@ -12,6 +12,7 @@ int draw_sprite(Sprite *sp);
 char *read_xpm(char *map[], int *wd, int *ht);
 void erase_sprite(Sprite *sprt, unsigned long background);
 int draw_asteroid(Sprite *sprt);
+int draw_shot(Sprite *sprt);
 int draw_spaceship(Sprite *sprt);
 
 /** Creates with random speeds (not zero) and position
