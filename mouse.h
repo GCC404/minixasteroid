@@ -41,15 +41,14 @@
 #define X_OVF				BIT(6)
 #define Y_OVF				BIT(7)
 
+static unsigned char packet[3];
+static unsigned short count=0;
+static unsigned long stat;
+static int mousehook=3;
 
-int test_packet();
-int test_asynch(unsigned short duration);
-int test_config(void);
 int mouse_unsubscribe_int();
 int mouse_subscribe_int();
-int timer_subscribe_int(void );
-int timer_unsubscribe_int(void );
-int handle_mouse(unsigned char mouse_evt);
+int mouse_int_handler(int* x, int* y, int* posx_inicial, int* posy_inicial, const int H_RES, const int V_RES);
 
 
 #endif

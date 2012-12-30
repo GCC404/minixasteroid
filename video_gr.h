@@ -10,10 +10,29 @@
  * Functions for outputing data to screen in graphics mode
  */
 
+/*
+ * @brief Copies one array to the other
+ *
+ * Copies the information in the secondary buffer to the VRAM
+ */
 void vg_buffertomem();
+/*
+ * @brief Copies one array to the other
+ *
+ * Copies the information from the VRAM to the secondary buffer
+ */
 void vg_memtobuffer();
-
-char vg_get_pixel(unsigned long x, unsigned long y);
+/*
+* @brief Gets the color from the input pixel
+*
+* Gets the color from the pixel at the specified position to the input value,
+*  by reading from the corresponding location in VRAM
+*
+* @param x horizontal coordinate, starts at 0 (leftmost pixel)
+* @param y vertical coordinate, starts at 0 (top pixel)
+* @return Color of the input pixel
+*
+*/
 char vg_get_pixel_buffer(unsigned long x, unsigned long y);
 
 /**
@@ -36,6 +55,12 @@ void *vg_init(unsigned long mode);
  * @return 0 on success, non-zero upon failure
  */
 int vg_fill(unsigned long color);
+/**
+ * @brief Fills the secondary buffer with the input color
+ *
+ * @param color color to fill the secondary buffer with
+ * @return 0 on success, non-zero upon failure
+ */
 int vg_fill_buffer(unsigned long color);
 
 /**
@@ -50,6 +75,17 @@ int vg_fill_buffer(unsigned long color);
  * @return 0 on success, non-zero otherwise
  */
 int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color);
+/**
+ * @brief Sets input pixel with input color
+ *
+ * Sets the color of the pixel at the specified position to the input value,
+ *  by writing to the corresponding location in the secondary buffer
+ *
+ * @param x horizontal coordinate, starts at 0 (leftmost pixel)
+ * @param y vertical coordinate, starts at 0 (top pixel)
+ * @param color color to set the pixel
+ * @return 0 on success, non-zero otherwise
+ */
 int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color);
 
  /**

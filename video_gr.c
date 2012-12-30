@@ -48,7 +48,6 @@ void * vg_init(unsigned long mode) {
 		printf("set_vbe_mode: sys_int86() failed \n");
 	}
 
-
 /*
 	vbe_mode_info_t info;
 
@@ -59,8 +58,6 @@ void * vg_init(unsigned long mode) {
 	v_res=info.YResolution;
 	bits_per_pixel=info.BitsPerPixel;
 	*video_mem=info.PhysBasePtr;*/
-
-
 
 	h_res=H_RES;
 	v_res=V_RES;
@@ -113,22 +110,6 @@ int vg_fill_buffer(unsigned long color) {
 	}
 }
 
-int vg_set_pixel(unsigned long x, unsigned long y, unsigned long color) {
-
-	char *p = video_mem;
-	int i;
-
-	if(color>=256||color<0||x<0||y<0||x>=h_res||y>=v_res)
-		return -1;
-
-	p+=x*bytes_per_pixel;
-	p+=y*h_res*bytes_per_pixel;
-
-	*p=(char)color;
-
-	return 0;
-}
-
 int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color) {
 
 	char *p = video_mem_buffer;
@@ -143,19 +124,6 @@ int vg_set_pixel_buffer(unsigned long x, unsigned long y, unsigned long color) {
 	*p=(char)color;
 
 	return 0;
-}
-
-char vg_get_pixel(unsigned long x, unsigned long y) {
-
-	char *p = video_mem;
-
-	if(x<0||y<0||x>=h_res||y>=v_res)
-			return -1;
-
-	p+=x*bytes_per_pixel;
-	p+=y*h_res*bytes_per_pixel;
-
-	return *p;
 }
 
 char vg_get_pixel_buffer(unsigned long x, unsigned long y) {

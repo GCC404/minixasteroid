@@ -32,7 +32,7 @@ Sprite *create_sprite(char *pic[], int x, int y) {
 	return sp;
 }
 
-char *read_xpm(char *map[], int *wd, int *ht)
+static char *read_xpm(char *map[], int *wd, int *ht)
 {
 	int width, height, colors;
 	char sym[256];
@@ -104,7 +104,7 @@ void erase_sprite(Sprite *sprt, unsigned long background) {
 
 }
 
-int draw_spaceship(Sprite *sprt) {
+int draw_battleship(Sprite *sprt) {
 	int i, j;
 	short colided=0;
 	Sprite tmp=*sprt;
@@ -130,7 +130,6 @@ int draw_asteroid(Sprite *sprt) {
 		for (j = 0; j < tmp.width; j++, tmp.map++)
 			if(*tmp.map!=0)
 				if(vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==30) {
-
 					return 1;
 				}
 				else if(vg_get_pixel_buffer(j,i)==0)
@@ -140,24 +139,7 @@ int draw_asteroid(Sprite *sprt) {
 	return 0;
 }
 
-int draw_shot(Sprite *sprt) {
-	int i, j;
-	Sprite tmp=*sprt;
-
-	for (i = 0; i < tmp.height; i++)
-		for (j = 0; j < tmp.width; j++, tmp.map++)
-			if(*tmp.map!=0)
-				if(vg_get_pixel_buffer(j+tmp.x,i+tmp.y)==63) {
-					return 1;
-				}
-				else if(vg_get_pixel_buffer(j,i)==0)
-					vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
-
-
-	return 0;
-}
-
-int draw_sprite(Sprite *sprt) {
+void draw_sprite(Sprite *sprt) {
 
 	int i, j;
 	Sprite tmp=*sprt;
@@ -167,5 +149,4 @@ int draw_sprite(Sprite *sprt) {
 			if(*tmp.map!=0)
 				vg_set_pixel_buffer(j+tmp.x, i+tmp.y, *tmp.map);
 
-	return 0;
 }

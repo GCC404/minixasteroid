@@ -92,8 +92,8 @@ int main(int argc, char **argv) {
 		asteroids[i]=create_sprite(asteroid,rand()%1024, -90*((i%9)+1) );
 	}
 
-	spaceships[0]=create_sprite(spaceship,posx_inicial,posy_inicial);
-	draw_spaceship(spaceships[0]);
+	battleship=create_sprite(spaceship,posx_inicial,posy_inicial);
+	draw_battleship(battleship);
 
 	vg_buffertomem();
 
@@ -116,10 +116,16 @@ int main(int argc, char **argv) {
 
 				if (msg.NOTIFY_ARG & 32) {
 
-					while(1) {
-						if(kbd_int_handler()!=-1)
-							break;
-					}
+					int response=kbd_int_handler(shots);
+
+					if(response!=-1)
+						if(response) {
+							shotsprt[4-shots]->x=(battleship->x)+17;
+							shotsprt[4-shots]->y=battleship->y;
+							shots--;
+							changed=1;
+						} else finished=5;
+
 				}
 
 				if (msg.NOTIFY_ARG & 16) {
@@ -175,7 +181,7 @@ int main(int argc, char **argv) {
 					}
 				}
 				if (msg.NOTIFY_ARG & 8) {
-					mouse_int_handler();
+					changed=mouse_int_handler(&(battleship->x),&(battleship->y),&posx_inicial,&posy_inicial,H_RES,V_RES);
 				}
 				break;
 
@@ -184,6 +190,17 @@ int main(int argc, char **argv) {
 			}
 		}
 	} while(finished<4);
+
+	vg_fill_buffer(BACKGROUND);
+	game_over=create_sprite(gameover,(H_RES/2)-150,(V_RES/2)-60);
+	draw_sprite(game_over);
+	for(i=0; i<3; i++) {
+		timesprt[i]->x+=(H_RES/2)-50;
+		timesprt[i]->y+=(V_RES/2)+80;
+		draw_sprite(timesprt[i]);
+	}
+	vg_buffertomem();
+	sleep(3);
 
 	rtc_unsubscribe_int();
 	mouse_unsubscribe_int();
@@ -200,7 +217,7 @@ void timer_int_handler() {
 	short tobedestroyed[NUM_ASTEROIDS]={0}, destshots[4]={0};
 
 	if(changed==1) {
-		finished+=draw_spaceship(spaceships[0]);
+		finished+=draw_battleship(battleship);
 
 		for(a=0; a<3; a++) {
 			draw_sprite(timesprt[a]);
@@ -217,7 +234,7 @@ void timer_int_handler() {
 	if(intcounter%ASTEROID_PERIOD==0 && finished<4) {
 
 		for(a=4-shots; a>0; a--) {
-			destshots[a-1]=draw_sprite(shotsprt[a-1]);
+			draw_sprite(shotsprt[a-1]);
 		}
 
 		for(a=0; a<NUM_ASTEROIDS; a++) {
@@ -286,76 +303,5 @@ void timer_int_handler() {
 		}
 
 		changed=1;
-	}
-}
-
-int kbd_int_handler() {
-	//Will store C@KBD responses
-	unsigned char scancode;
-
-	scancode = kbd_readscancode();
-
-	if(scancode==-1) {
-		printf("Reading Error from Status Register");
-		return -1;
-	}
-
-	if(scancode==SPACE_BREAK && shots>0) {
-
-		shotsprt[4-shots]->x=(spaceships[0]->x)+17;
-		shotsprt[4-shots]->y=spaceships[0]->y;
-
-		shots--;
-		changed=1;
-	}
-
-	if(scancode==ESC_BREAK)
-		finished=5;
-}
-
-void mouse_int_handler() {
-
-	sys_inb(IN_BUF,&stat);
-
-	int confirma=0;
-
-	if( !(stat&BIT(3)) && (count==0))
-		confirma=1;
-
-	packet[count]=stat;
-	count++;
-
-	if(count==3 && confirma==0) {
-		count=0;
-
-		if(packet[1]!=0 || packet[2]!=0) {
-			changed=1;
-
-			if(packet[1]!=0) {
-				if(packet[1]<128)
-					posx_inicial+=packet[1];
-				else posx_inicial+=packet[1]-256;
-
-				if(posx_inicial<0)
-					posx_inicial=0;
-				else if(posx_inicial>(H_RES-40))
-					posx_inicial=H_RES-40;
-
-				spaceships[0]->x=posx_inicial;
-			}
-
-			if(packet[2]!=0) {
-				if(packet[2]<128)
-					posy_inicial-=packet[2];
-				else posy_inicial-=packet[2]-256;
-
-				if(posy_inicial<0)
-					posy_inicial=0;
-				else if(posy_inicial>(V_RES-100))
-					posy_inicial=V_RES-100;
-
-				spaceships[0]->y=posy_inicial;
-			}
-		}
 	}
 }
