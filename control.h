@@ -50,7 +50,7 @@ int kbd_subscribe_int();
  */
 int kbd_unsubscribe_int();
 /**
- * @brief Reads the scancode from the C@KBD
+ * @brief Reads the scancode from the CKBD
  *
  * @return Returns the scancode
  */

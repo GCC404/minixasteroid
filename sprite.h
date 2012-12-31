@@ -1,11 +1,17 @@
 #ifndef __SPRITE_H
 #define __SPRITE_H
 
+/** @defgroup sprite sprites
+ * @{
+ *
+ * Functions for creating and manipulating Sprites (set of pixels with a given position)
+ */
 
 typedef struct {
-	int x, y; // current position
-	int width, height; // dimensions
-	char *map; // the pixmap
+	int x; /**< @brief current position in the x axis */
+	int y; /**< @brief current position in the x axis */
+	int width, height; /**< @brief current size */
+	char *map; /**< @brief the pixmap */
 } Sprite;
 
 /**
@@ -22,7 +28,7 @@ static char *read_xpm(char *map[], int *wd, int *ht);
  *
  * Fills the position of the sprite with a given color
  *
- * @param sp Sprite being erased
+ * @param sprt Sprite being erased
  * @param background The color of the background
  */
 void erase_sprite(Sprite *sprt, unsigned long background);
