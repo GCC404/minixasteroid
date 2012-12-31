@@ -17,7 +17,7 @@
 #define NUM_ASTEROIDS		35
 #define ASTEROID_PERIOD		1			// controls asteroid's movement rate
 #define SHOT_PERIOD			150			//Time between shot's recharge
-#define DELTA				600			//Time between velocity increment
+#define DELTA				10			//Time between velocity increment
 
 static char** digits[]={digits0,digits1,digits2,digits3,digits4,digits5,digits6,digits7,digits8, digits9};
 

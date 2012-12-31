@@ -12,6 +12,7 @@ int kbd_subscribe_int(void ) {
 
 int kbd_unsubscribe_int() {
 
+	kbd_readscancode();
 	sys_irqrmpolicy(&kbdhook);
 	sys_irqdisable(&kbdhook);
 
@@ -60,6 +61,17 @@ int kbd_int_handler(const unsigned int shots) {
 
 int mouse_subscribe_int() {
 
+	unsigned long stat;
+
+	//Enable Mouse
+	sys_outb(KBC_CMD_REG,ENABLE_MOUSE);
+
+	//Enable Sending Data Packets
+	sys_outb(KBC_CMD_REG,WRITE_BYTE);
+	sys_inb(IN_BUF,&stat);
+	sys_outb(OUT_BUF,ENABLE_DATA);
+	sys_inb(IN_BUF, &stat);
+
 	sys_irqsetpolicy(MOUSE_IRQ,IRQ_REENABLE|IRQ_EXCLUSIVE,&mousehook);
 	sys_irqenable(&mousehook);
 
@@ -67,6 +79,10 @@ int mouse_subscribe_int() {
 }
 
 int mouse_unsubscribe_int() {
+
+	unsigned long stat;
+
+	sys_inb(IN_BUF,&stat);
 
 	sys_irqrmpolicy(&mousehook);
 	sys_irqdisable(&mousehook);

@@ -12,6 +12,9 @@ int mouse_subscribe_int() {
 
 int mouse_unsubscribe_int() {
 
+	unsigned long stat;
+
+	sys_inb(IN_BUF,&stat);
 	sys_irqrmpolicy(&mousehook);
 	sys_irqdisable(&mousehook);
 

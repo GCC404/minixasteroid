@@ -1,6 +1,8 @@
 #include "proj.h"
 
 //int kbdhook=5, timerhook=2, mousehook=3, rtc_hook=4;
+//
+//Cores:
 //27 pilhadentro
 //17 interior
 //25 exterior
@@ -8,53 +10,24 @@
 //63 asteroid
 //30 shot
 
-/* RTC atualizar velocidade (asteroidvel) com alarme -> corrigir isto -> acho que o lab nao esta bem
- * Destruir Asteroides
- * Carregar palete
- *
- * Modular codigo -> tirar do principal e meter nos outros (ver ponto abaixo)
- * Partilhar variaveis globais com modulos
- * remover extras dos .c
- *
- * (do)comentar codigo
- *
- * Pormenores:
- * Page flipping
- * Ataques especiais (?)
- * Tiro sincronia - provavelmente nao e preciso
- */
-
 int main(int argc, char **argv) {
+
+	printf("Comecouu\n");
 
 	//Used for peripheric functioning (including interrupts)
 	endpoint_t ep;
 	char name[256];
 	int priv_f;
 	int ipc_status;
+	unsigned long stat;
 	message msg;
 
+	//Setting the system to exclusive peripheric use by the program
 	sef_startup();
 	sys_whoami(&ep, name, 256, &priv_f);
 	sys_enable_iop(ep);
-
-	//Subscribing RTC interrupts
-	unsigned long stat;
-	choosePort(REG_B);
-	readPort(&stat);
-	choosePort(REG_B);
-	writePort((stat&0x7F)|BIT(4)|BIT(5));
-	rtc_subscribe_int();
-
-	//Enable Mouse
-	sys_outb(KBC_CMD_REG,ENABLE_MOUSE);
-
-	//Enable Sending Data Packets
-	sys_outb(KBC_CMD_REG,WRITE_BYTE);
-	sys_inb(IN_BUF,&stat);
-	sys_outb(OUT_BUF,ENABLE_DATA);
-	sys_inb(IN_BUF, &stat);
 	mouse_subscribe_int();
-
+	rtc_subscribe_int();
 	timer_subscribe_int();
 	kbd_subscribe_int();
 
@@ -129,60 +102,19 @@ int main(int argc, char **argv) {
 				}
 
 				if (msg.NOTIFY_ARG & 16) {
+					readtime=rtc_int_handler(readtime,timesalarm,DELTA);
 
-					choosePort(REG_C);
-					readPort(&stat);
-
-					if( ((stat&BIT(4))!=0) && (readtime==0)) {
-
-						//Reads timesalarm
-						readTime(&timesalarm[2],HOURS,&stat);
-						readTime(&timesalarm[1],MINUTES,&stat);
-						readTime(&timesalarm[0],SECONDS,&stat);
-
-						//Sets the alarm
-						choosePort(SECONDS_ALARM);
-
-						if(timesalarm[1]+1>=60) {
-							timesalarm[1]=0;
-
-							if(timesalarm[2]+1>=24)
-								timesalarm[2]=0;
-							else timesalarm[2]=timesalarm[2]+1;
-						}
-						else timesalarm[1]=timesalarm[1]+1;
-
-						if(timesalarm[0]+(DELTA-60)>=60) {
-							timesalarm[0]=timesalarm[0]+(DELTA-60)-60;
-
-							if(timesalarm[1]+1>=60) {
-								timesalarm[1]=0;
-
-								if(timesalarm[2]+1>=24)
-									timesalarm[2]=0;
-								else timesalarm[2]=timesalarm[2]+1;
-							}
-							else timesalarm[1]=timesalarm[1]+1;
-
-						}else timesalarm[0]=timesalarm[0]+(DELTA-60);
-
-						writePort(timesalarm[0]);
-						choosePort(MINUTES_ALARM);
-						writePort(timesalarm[1]);
-						choosePort(HOURS_ALARM);
-						writePort(timesalarm[2]);
-
-						readtime=1;
-					}
-					else {
-						readtime=0;
+					if(!readtime) {
+						printf("Alarm!\n");
 						asteroidvel++;
-						//shipvel++;
 					}
+
 				}
+
 				if (msg.NOTIFY_ARG & 8) {
 					changed=mouse_int_handler(&(battleship->x),&(battleship->y),&posx_inicial,&posy_inicial,H_RES,V_RES);
 				}
+
 				break;
 
 			default:
@@ -192,16 +124,36 @@ int main(int argc, char **argv) {
 	} while(finished<4);
 
 	vg_fill_buffer(BACKGROUND);
+
+	//Setting GameOver screen, repositioning timesprt
 	game_over=create_sprite(gameover,(H_RES/2)-150,(V_RES/2)-60);
 	draw_sprite(game_over);
 	for(i=0; i<3; i++) {
 		timesprt[i]->x+=(H_RES/2)-50;
-		timesprt[i]->y+=(V_RES/2)+80;
+		timesprt[i]->y+=(V_RES/2)+30;
 		draw_sprite(timesprt[i]);
 	}
 	vg_buffertomem();
-	sleep(3);
 
+	//Delaying program execution, to give the user time to see the score (which is the time he survived)
+	intcounter=0;
+	do {
+			if ( driver_receive(ANY, &msg, &ipc_status) != 0 ) {
+				printf("driver_receive failed with: %d", 55555);
+				continue;
+			}
+			if (is_ipc_notify(ipc_status)) {
+				switch (_ENDPOINT_P(msg.m_source)) {
+
+				case HARDWARE:
+					if (msg.NOTIFY_ARG & 4) {
+						intcounter++;
+					}
+				}
+			}
+	}while(intcounter<210);
+
+	//Returning the system to its normal state
 	rtc_unsubscribe_int();
 	mouse_unsubscribe_int();
 	timer_unsubscribe_int();

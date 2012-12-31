@@ -8,11 +8,13 @@
  */
 
 #define STAT_REG 			0x64
+#define KBC_CMD_REG 		0x64
 #define OUT_BUF				0x60
 #define IN_BUF 				0x60 //or 0x64
 #define KBD_IRQ				1
 #define MOUSE_IRQ			12
 #define DELAY_US 			20000
+
 
 //C@KBD responses
 #define ESC_MAKE			0x01
