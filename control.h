@@ -32,6 +32,7 @@
 //Mouse commands
 #define ENABLE_MOUSE		0xA8
 #define ENABLE_DATA			0xF4
+#define DISABLE_DATA		0xF5
 #define WRITE_BYTE			0xD4 //commands the KBC to forward its argument to the mouse
 
 static int mousehook=3, kbdhook=5;

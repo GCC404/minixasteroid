@@ -82,6 +82,9 @@ int mouse_unsubscribe_int() {
 
 	unsigned long stat;
 
+	sys_outb(KBC_CMD_REG,WRITE_BYTE);
+	sys_outb(OUT_BUF,DISABLE_DATA);
+
 	sys_inb(IN_BUF,&stat);
 
 	sys_irqrmpolicy(&mousehook);
