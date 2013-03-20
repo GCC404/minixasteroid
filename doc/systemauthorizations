@@ -1,0 +1,31 @@
+service proj
+{
+	system
+		UMAP		# 14
+		INT86		# 20
+		PRIVCTL
+		READBIOS
+		DEVIO
+		IRQCTL	
+		;
+	ipc
+		SYSTEM	# to retrieve system information
+		rs      # for service initialization
+		vm		# to map video RAM
+		pm    	# for malloc, if needed
+		vfs
+		;
+	io
+		40:4	# Timer
+		60		# KBC
+		64		# KBC
+		70:2	# RTC
+		;               
+	irq
+		0       # TIMER 0 IRQ
+		8		# RTC
+		1		# KBD IRQ
+		12		# MOUSE IRQ
+        ;
+	uid 0;
+};
